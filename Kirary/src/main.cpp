@@ -32,26 +32,16 @@ void read_moister();
 void setup()
 {
   Serial.begin(9600);
-
-  //while (!Serial);
-  //SPI.begin();
-
+  
   connect_to_wifi();
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
 
   //Set database read timeout to 1 minute (max 15 minutes)
   Firebase.setReadTimeout(firebaseData, 1000 * 60);
-  //tiny, small, medium, large and unlimited.
+  
   //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
-  Firebase.setwriteSizeLimit(firebaseData, "tiny");
-
-  /*
-  for (int i = 0; i < 10; i++) {
-    Firebase.setDouble(firebaseData, path + DEVICE_ID +"/Double/Data" + (i + 1), i*10.00);
-    delay(5000);
-  }
-  */
+  Firebase.setwriteSizeLimit(firebaseData, "small");
 }
 
 void loop()
@@ -124,9 +114,22 @@ void push_temprature(double indata)
 //int pinOut = 10;
 
 //Kode for turning on and off water pump
-/*
-digitalWrite(pinOut, HIGH);
-delay(5000);
-digitalWrite(pinOut, LOW);
-delay(5000);
+/* TODO: Not working, may need to finde the correct pin....
+int pinOut = 35;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  //Kode for turning on and off water pump
+  digitalWrite(pinOut, HIGH);
+  Serial.println("HIGH");
+  delay(5000);
+  digitalWrite(pinOut, LOW);
+  Serial.println("LOW");
+  delay(5000);
+
+}
 */
