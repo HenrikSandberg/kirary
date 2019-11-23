@@ -1,5 +1,6 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/database';
 
 const config = {
     apiKey: "AIzaSyDpEivc65FYQBnVTEWqSMaIETo5l0_6IsI",
@@ -12,22 +13,32 @@ const config = {
 };
 
 class Firebase {
-constructor() {
-    app.initializeApp(config);
-    this.auth = app.auth();
+    constructor() {
+        app.initializeApp(config);
+        this.auth = app.auth();
+        this.db = app.database();
     }
 
     doCreateUserWithEmailAndPassword = (email, password) =>
         this.auth.createUserWithEmailAndPassword(email, password);
 
-    doSignInWithEmailAndPassword = (email, password) =>
+    doSignInWithEmailAndPassword = (email, password) => 
         this.auth.signInWithEmailAndPassword(email, password);
 
     doSignOut = () => this.auth.signOut();
 
     doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
     
-    doPasswordUpdate = password =>
+    doPasswordUpdate = password => 
       this.auth.currentUser.updatePassword(password);
+
+    //TODO: Delete account action
+
+
+    //DATABASE GET
+    user = uid => this.db.ref(`users/${uid}`);
+    users = () => this.db.ref('users');
+    devices = () => this.db.ref('devide');
+    device = uid => this.db.ref(`devide/${uid}`);
 }
 export default Firebase;
