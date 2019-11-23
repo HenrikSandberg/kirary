@@ -16,7 +16,6 @@ const App = () => (
     <Router>
         <div>
             <Navigation/>
-            <hr/>
             <Switch>
                 <Route path={ROUTES.ACCOUNT} component={Account} />
                 <Route exact path={ROUTES.LANDING} component={Landing} />

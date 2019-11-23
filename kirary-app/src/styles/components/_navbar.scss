@@ -1,0 +1,96 @@
+
+/* Normalize the lists */
+.menu,
+.sub-menu {
+  margin: 0;
+  padding: 0;
+  li {
+    margin: 0;
+  }
+}
+
+.menu {
+  button {
+    border: none;
+    width: 100%;
+    height: 100%;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    background: $accept-color-three;
+  }
+
+  .brand-logo {
+    width: 100px;
+    height: 20px;
+    //border-radius: 50%;
+    overflow: hidden;
+    //margin-top: -6px;
+  }
+}
+
+
+
+/* Baseline for our menu */
+.navigation {
+    line-height: 1; /* 1 */
+    .menu {
+      a,
+      li {
+        display: block; /* 2 */
+      }
+  
+      a {
+        text-decoration: none; /* 3 */
+        color: currentColor; /* 4 */
+        padding: 1em; /* 5 */
+      }
+  
+      li {
+        border-style: solid; /* 6 */
+        border-width: 0 0 1px;
+      }
+    }
+}
+ @media only screen and (min-width: 1024px) {
+    /* Baseline */
+    .navigation {
+      .menu {
+        display: flex; /* 1 */
+        > li {
+          border-width: 0 1px 0 0; /* 2 */
+          > a {
+            padding: 1.25em 1.5em; /* 3 */
+          }
+        }
+      }
+    }
+}
+
+$menu-color: $off-white;
+$menu-bg: $brand-background;
+$menu-item-hover-color: rgba(white, .9);
+$menu-item-hover-bg: black;
+$menu-item-border-color: lighten($menu-bg, 3%);
+
+.navigation {
+  background-color: $menu-bg;
+  color: $menu-color;
+  .menu {
+    li {
+      border-color: $menu-item-border-color;
+      &:hover,
+      &:focus,
+      &:active {
+        > a {
+          color: $menu-item-hover-color;
+          background-color: $menu-item-hover-bg;
+        }
+      }
+    }
+  }
+}

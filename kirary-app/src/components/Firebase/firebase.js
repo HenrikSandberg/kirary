@@ -32,7 +32,7 @@ class Firebase {
     doPasswordUpdate = password => 
       this.auth.currentUser.updatePassword(password);
 
-    //TODO: Delete account action
+    //TODO: Add delete account
 
 
     //DATABASE GET
@@ -42,6 +42,6 @@ class Firebase {
     device = uid => this.db.ref(`devide/${uid}`);
 
     //UPDATE DATABASE
-    
+
 }
 export default Firebase;

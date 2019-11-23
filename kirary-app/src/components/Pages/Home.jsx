@@ -36,34 +36,47 @@ class Home extends Component {
         const { users, loading } = this.state;
 
         return (
-          <div>
-            <h1>Home</h1>
-            
-            {loading && <div>Loading ...</div>}
+            <div>
+                {loading && <div>Loading ...</div>}
+                {!loading && 
+                    <div class="grid-container">
+        
+                        <main class="main">
+                            <Overview devices={users}/>
+       
+                    
+                            <div class="main-cards">
+                                <div class="card">Card</div>
+                                <div class="card">Card</div>
+                                <div class="card">Card</div>
+                            </div>
+                        </main>
+                        
+                        <footer class="footer">
+                            <div class="footer__copyright">&copy; 2018 MTH</div>
+                            <div class="footer__signature">Made with love by pure genius</div>
+                        </footer>
+                    </div>
+                }
+            </div>
 
-            <UserList users={users} />
-          </div>
         );
     }
 }
 
-const UserList = ({ users }) => (
-    <ul>
-        {users.map(user => (
-            <li key={user.uid}>
-                <span>
-                    <strong>ID:</strong> {user.uid}
-                </span>
-
-                <span>
-                    <strong>Moister:</strong> {user.moister}
-                </span>
-                <span>
-                    <strong>Temprature:</strong> {Math.round(user.temprature)}
-                </span>
-            </li>
-        ))}
-    </ul>
+const Overview = ({devices}) => (
+    devices.map(device => (
+        <div class="main-overview">
+            <div class="overviewcard" key={device.uid}>
+                <div class="overviewcard__icon">Moister</div>
+                <div class="overviewcard__info">{device.moister}</div>
+            </div>
+            <div class="overviewcard" key={device.uid}>
+                <div class="overviewcard__icon">Temprature</div>
+                <div class="overviewcard__info">{device.temprature}</div>
+            </div>
+        </div>
+    ))
 );
 
 export default withFirebase(Home);
