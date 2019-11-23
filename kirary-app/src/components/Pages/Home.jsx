@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import { withFirebase } from '../Firebase';
 
+import drop from '../../resources/icons/drop.svg';
+import temprature from '../../resources/icons/temprature.svg';
+
 class Home extends Component {
     constructor(props) {
         super(props);
@@ -67,16 +70,27 @@ class Home extends Component {
 const Overview = ({devices}) => (
     devices.map(device => (
         <div class="main-overview">
-            <div class="overviewcard" key={device.uid}>
-                <div class="overviewcard__icon">Moister</div>
-                <div class="overviewcard__info">{device.moister}</div>
-            </div>
-            <div class="overviewcard" key={device.uid}>
-                <div class="overviewcard__icon">Temprature</div>
-                <div class="overviewcard__info">{device.temprature}</div>
-            </div>
+            <OverviewContent 
+                key={device.uid} 
+                title={"Moister"} 
+                content={device.moister}
+                icon={drop}/>
+
+            <OverviewContent 
+                key={device.uid} 
+                title={"Temprature"} 
+                content={device.temprature.toFixed(2) + "°C"}
+                icon = {temprature}/>
         </div>
     ))
+);
+
+const OverviewContent = ({key, title, content, icon}) => (
+    <div class="overviewcard" key={key}>
+        <div class="title">{title}</div>        
+        <div class="info">{content}</div>
+        <img src={icon} className='overview-icon'/>
+    </div>
 );
 
 export default withFirebase(Home);

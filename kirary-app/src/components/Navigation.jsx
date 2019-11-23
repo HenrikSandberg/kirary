@@ -5,7 +5,7 @@ import SignOutButton from './Authentication/SignOut';
 import * as ROUTES from '../constants/routes';
 import { AuthUserContext } from './Session';
 
-import logo from '../Images/logo.png';
+import logo from '../resources/images/logo.png';
 
 const Navigation = () => (
   <div>
