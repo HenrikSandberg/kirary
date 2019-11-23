@@ -40,5 +40,8 @@ class Firebase {
     users = () => this.db.ref('users');
     devices = () => this.db.ref('devide');
     device = uid => this.db.ref(`devide/${uid}`);
+
+    //UPDATE DATABASE
+    
 }
 export default Firebase;
