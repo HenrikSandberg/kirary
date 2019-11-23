@@ -1,10 +1,9 @@
 import React from 'react';
+import  { FirebaseContext } from './Firebase';
 
-export default () => {
-    console.log('Hello world');
-    return (
-        <div>
-            <h1>Hello World</h1>
-        </div>
-    );
-}
+export default () => (
+    <div>
+        <h1>Hello world</h1>
+    </div>
+
+);
