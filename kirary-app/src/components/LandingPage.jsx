@@ -2,6 +2,6 @@ import React from 'react';
 
 export default () => (
     <div>
-        <h1>Hello world</h1>
+        <h1>Landing Page</h1>
     </div>
 )
