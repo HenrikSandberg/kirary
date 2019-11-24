@@ -46,8 +46,6 @@ class Home extends Component {
         
                         <main class="main">
                             <Overview devices={users}/>
-       
-                    
                             <div class="main-cards">
                                 <div class="card">Card</div>
                                 <div class="card">Card</div>
@@ -56,10 +54,11 @@ class Home extends Component {
                         </main>
                         
                         <footer class="footer">
-                            <div class="footer__copyright">&copy; 2018 MTH</div>
-                            <div class="footer__signature">Made with love by pure genius</div>
+                            <div class="footer__copyright">&copy; 2019</div>
+                            <div class="footer__signature">Made in Norway</div>
                         </footer>
                     </div>
+                    //TODO: Need to be able to add a device to user
                 }
             </div>
 
@@ -86,9 +85,9 @@ const Overview = ({devices}) => (
 );
 
 const OverviewContent = ({key, title, content, icon}) => (
-    <div class="overviewcard" key={key}>
-        <div class="title">{title}</div>        
+    <div class="overviewcard" key={key}>        
         <div class="info">{content}</div>
+        <div class="title">{title}</div>
         <img src={icon} className='overview-icon'/>
     </div>
 );

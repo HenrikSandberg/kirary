@@ -42,6 +42,10 @@ class Firebase {
     device = uid => this.db.ref(`devide/${uid}`);
 
     //UPDATE DATABASE
-
+    
+    addDeviceToUnser = uid => this.db.ref(`users/${uid}`).child('devides').push().set({
+        author: "alanisawesome",
+        title: "The Turing Machine"
+    })
 }
 export default Firebase;

@@ -1,18 +1,16 @@
 
-/* Assign grid instructions to our parent grid container, mobile-first (hide the sidenav) */
 .grid-container {
     display: grid;
     grid-template-columns: 1fr;
     //grid-template-rows: 50px 1fr 50px;
     grid-template-areas:
-        'header'
         'main'
         'footer';
     height: 100vh;
 }
 
 .menu-icon {
-    position: fixed; /* Needs to stay visible for all mobile scrolling */
+    position: fixed;
     display: flex;
     top: 5px;
     left: 10px;
@@ -59,14 +57,15 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px;
-    background-color: #d3d3;
+    background-color: #7BADF3;
+    box-shadow: $brand-box-shadow;
 }
 
 .main-cards {
     column-count: 2;
     column-gap: 20px;
     margin: 20px;
-  }
+}
 
 .card {
     display: flex;
@@ -102,5 +101,5 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
-    background-color: #648ca6;
+    background-color: $brand-background;
 }
