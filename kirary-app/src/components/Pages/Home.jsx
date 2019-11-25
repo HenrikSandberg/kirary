@@ -17,7 +17,7 @@ const Home = (props) => {
         } else if (user && (numDevices !== devices.length)){
             getDevices();
         }
-    }, [user, loading, devices, numDevices])
+    }, [user, loading, devices, numDevices]);
 
     const getUser = () => {
         props.firebase.auth.onAuthStateChanged(user => {
@@ -61,39 +61,36 @@ const Home = (props) => {
     };
 
     return (
-        <div>
-            
-            <div className="grid-container">
-                <header className="header">
-                    <div className="header__search">
-                        <form onSubmit={onSubmit}>
-                            <input
-                                name="deviceID"
-                                value={deviceID}
-                                onChange={onChange}
-                                type="text"
-                                placeholder="Add device" />
-                                <button disabled={deviceID === ''} onClick={onSubmit} type="submit"> Add device </button>
-                        </form>
+        <div className="grid-container">
+            <header className="header">
+                <div className="header__search">
+                    <form onSubmit={onSubmit}>
+                        <input
+                            name="deviceID"
+                            value={deviceID}
+                            onChange={onChange}
+                            type="text"
+                            placeholder="Add device" />
+                            <button disabled={deviceID === ''} onClick={onSubmit} type="submit"> Add device </button>
+                    </form>
+                </div>
+                <div className="header__avatar">Your face</div>
+            </header>
+            {loading && <main className="main">Loading ...</main>}
+            {!loading && 
+                <main className="main">
+                    <Overview devices={devices}/>
+                    <div className="main-cards">
+                        <div className="card">Card</div>
+                        <div className="card">Card</div>
+                        <div className="card">Card</div>
                     </div>
-                    <div className="header__avatar">Your face</div>
-                </header>
-                {loading && <main className="main">Loading ...</main>}
-                {!loading && 
-                    <main className="main">
-                        <Overview devices={devices}/>
-                        <div className="main-cards">
-                            <div className="card">Card</div>
-                            <div className="card">Card</div>
-                            <div className="card">Card</div>
-                        </div>
-                    </main>
-                }                
-                <footer className="footer">
-                    <div className="footer__copyright">&copy; 2019</div>
-                    <div className="footer__signature">Made in Norway</div>
-                </footer>
-            </div>
+                </main>
+            }                
+            <footer className="footer">
+                <div className="footer__copyright">&copy; 2019</div>
+                <div className="footer__signature">Made in Norway</div>
+            </footer>
         </div>
     );
 }
