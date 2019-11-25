@@ -100,15 +100,18 @@ const Overview = ({devices}) => {
     return (
         devices.map(device => (
             <div className="main-overview" key={device.uid+String(count++)}>
-                <OverviewContent 
-                    title={"Moister"} 
-                    content={device.moister}
-                    icon={drop}/>
-
-                <OverviewContent 
-                    title={"Temprature"} 
-                    content={device.temprature.toFixed(2) + "°C"}
-                    icon = {temprature}/>
+                {device.moister &&
+                    <OverviewContent 
+                        title={"Moister"} 
+                        content={device.moister}
+                        icon={drop}/>
+                }
+                {device.temprature &&
+                    <OverviewContent 
+                        title={"Temprature"} 
+                        content={device.temprature.toFixed(2) + "°C"}
+                        icon = {temprature}/>
+                }
             </div>
             
         ))
