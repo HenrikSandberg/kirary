@@ -19,6 +19,14 @@ class Firebase {
         this.db = app.database();
     }
 
+    getCurrentUser = () => {
+        this.auth.onAuthStateChanged((user) => {
+            if (user) {
+              return user;
+            } 
+          });
+    }
+
     doCreateUserWithEmailAndPassword = (email, password) =>
         this.auth.createUserWithEmailAndPassword(email, password);
 
@@ -29,8 +37,7 @@ class Firebase {
 
     doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
     
-    doPasswordUpdate = password => 
-      this.auth.currentUser.updatePassword(password);
+    doPasswordUpdate = password => this.auth.currentUser.updatePassword(password);
 
     //TODO: Add delete account
 
@@ -43,9 +50,20 @@ class Firebase {
 
     //UPDATE DATABASE
     
-    addDeviceToUnser = uid => this.db.ref(`users/${uid}`).child('devides').push().set({
-        author: "alanisawesome",
-        title: "The Turing Machine"
-    })
+    getDevicesFromUser = uid => this.db.ref(`users/${uid}/devides`);
+
+    addDeviceToUnser = (uid, deviceUid) => {
+        this.device(deviceUid).on('value', snapshot => {
+            if (snapshot.val() !== null) {
+                this.getDevicesFromUser(uid).on('value', inner => {
+                    if(!JSON.stringify(inner.val()).includes(deviceUid)){
+                        this.db.ref(`users/${uid}`).child('devides').push().set({uid: deviceUid});
+                    }
+                });                
+            }
+        })
+    }
+
+    
 }
 export default Firebase;

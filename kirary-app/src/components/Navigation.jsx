@@ -18,8 +18,8 @@ const Navigation = () => (
 );
 
 const NavigationAuth = () => (
-  <nav class="navigation">
-    <ul class="menu">
+  <nav className="navigation">
+    <ul className="menu">
       <li>
         <Link to={ROUTES.LANDING}>
           <img src={logo} className='brand-logo'/>
@@ -31,7 +31,7 @@ const NavigationAuth = () => (
       <li>
         <Link to={ROUTES.ACCOUNT}>Account</Link>
       </li>
-      <li class='sign-out'>
+      <li className='sign-out'>
         <SignOutButton />
       </li>
     </ul>
@@ -39,8 +39,8 @@ const NavigationAuth = () => (
 );
 
 const NavigationNonAuth = () => (
-  <nav class="navigation">
-    <ul class="menu">
+  <nav className="navigation">
+    <ul className="menu">
       <li>
         <Link to={ROUTES.LANDING}>Landing</Link>
       </li>

@@ -1,94 +1,128 @@
-import React, {Component} from 'react';
+import React, {useEffect, useState} from 'react';
 import { withFirebase } from '../Firebase';
 
 import drop from '../../resources/icons/drop.svg';
 import temprature from '../../resources/icons/temprature.svg';
 
-class Home extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-          loading: false,
-          users: [],
-        };
+const Home = (props) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [devices, setDevices] = useState([]);
+    const [numDevices, setNumDevices] = useState(false)
+    const [deviceID, setDeviceID] = useState('');
+
+    useEffect(() => {
+        if (user === null || user === undefined) {
+            getUser();
+        } else if (user && (numDevices !== devices.length)){
+            getDevices();
+        }
+    }, [user, loading, devices, numDevices])
+
+    const getUser = () => {
+        props.firebase.auth.onAuthStateChanged(user => {
+			if (user) {
+                setUser(user);
+			} 
+		});
     }
-    
-    componentDidMount() {
-        this.setState({ loading: true });
 
-        this.props.firebase.devices().on('value', snapshot => {
-          const usersObject = snapshot.val();
+    const updateDevices = newDevices => {
+        if (JSON.stringify(devices) !== (JSON.stringify(newDevices))) {
+            setDevices([]);
+            setDevices(newDevices);
+            if (loading) setLoading(false);
+        }
+    }
 
-          const usersList = Object.keys(usersObject).map(key => ({
-            ...usersObject[key],
-            uid: key,
-          }));
-
-          this.setState({
-            users: usersList,
-            loading: false,
-          });
+    const getDevices = () => {
+        let deviceList = [];
+        props.firebase.getDevicesFromUser(user.uid).on('value', snapshot => {
+            snapshot.forEach(childSnapshot => {
+                const data = childSnapshot.val();
+                props.firebase.device(data.uid).on('value', inner => {
+                    deviceList.push(inner.val());
+                    updateDevices(deviceList);
+                    setNumDevices(deviceList.length);
+                });
+            });
         });
     }
+    
+    const onSubmit = event => {
+        props.firebase.addDeviceToUnser(user.uid, deviceID);
+        setDeviceID('');
+        event.preventDefault();
+    };
 
-    componentWillUnmount() {
-        this.props.firebase.users().off();
-    }
+    const onChange = event => {
+        setDeviceID(event.target.value);
+    };
 
-    render() {
-        const { users, loading } = this.state;
-
-        return (
-            <div>
-                {loading && <div>Loading ...</div>}
-                {!loading && 
-                    <div class="grid-container">
-        
-                        <main class="main">
-                            <Overview devices={users}/>
-                            <div class="main-cards">
-                                <div class="card">Card</div>
-                                <div class="card">Card</div>
-                                <div class="card">Card</div>
-                            </div>
-                        </main>
-                        
-                        <footer class="footer">
-                            <div class="footer__copyright">&copy; 2019</div>
-                            <div class="footer__signature">Made in Norway</div>
-                        </footer>
-                    </div>
-                    //TODO: Need to be able to add a device to user
-                }
-            </div>
-
-        );
-    }
+    return (
+        <div>
+            {loading && <div>Loading ...</div>}
+            {!loading && 
+                <div className="grid-container">
+                    <header className="header">
+                        <div className="header__search">
+                            <form onSubmit={onSubmit}>
+                                <input
+                                    name="deviceID"
+                                    value={deviceID}
+                                    onChange={onChange}
+                                    type="text"
+                                    placeholder="Add device" />
+                                    <button disabled={deviceID === ''} onClick={onSubmit} type="submit"> Add device </button>
+                            </form>
+                        </div>
+                        <div className="header__avatar">Your face</div>
+                    </header>
+    
+                    <main className="main">
+                        <Overview devices={devices}/>
+                        <div className="main-cards">
+                            <div className="card">Card</div>
+                            <div className="card">Card</div>
+                            <div className="card">Card</div>
+                        </div>
+                    </main>
+                    
+                    <footer className="footer">
+                        <div className="footer__copyright">&copy; 2019</div>
+                        <div className="footer__signature">Made in Norway</div>
+                    </footer>
+                </div>
+            }
+        </div>
+    );
 }
 
-const Overview = ({devices}) => (
-    devices.map(device => (
-        <div class="main-overview">
-            <OverviewContent 
-                key={device.uid} 
-                title={"Moister"} 
-                content={device.moister}
-                icon={drop}/>
+const Overview = ({devices}) => {
+    let count = 0;
+    return (
+        devices.map(device => (
+            <div className="main-overview" key={device.uid+String(count++)}>
+                <OverviewContent 
+                    title={"Moister"} 
+                    content={device.moister}
+                    icon={drop}/>
 
-            <OverviewContent 
-                key={device.uid} 
-                title={"Temprature"} 
-                content={device.temprature.toFixed(2) + "°C"}
-                icon = {temprature}/>
-        </div>
-    ))
-);
+                <OverviewContent 
+                    title={"Temprature"} 
+                    content={device.temprature.toFixed(2) + "°C"}
+                    icon = {temprature}/>
+            </div>
+            
+        ))
+    );
+}
 
 const OverviewContent = ({key, title, content, icon}) => (
-    <div class="overviewcard" key={key}>        
-        <div class="info">{content}</div>
-        <div class="title">{title}</div>
-        <img src={icon} className='overview-icon'/>
+    <div className="overviewcard" key={key}>        
+        <div className="info">{content}</div>
+        <div className="title">{title}</div>
+        <img src={icon} alt-text='icon' className='overview-icon'/>
     </div>
 );
 
