@@ -38,6 +38,7 @@ const Home = (props) => {
     const getDevices = () => {
         let deviceList = [];
         props.firebase.getDevicesFromUser(user.uid).on('value', snapshot => {
+            console.log(snapshot.val());
             snapshot.forEach(childSnapshot => {
                 const data = childSnapshot.val();
                 props.firebase.device(data.uid).on('value', inner => {
@@ -61,24 +62,24 @@ const Home = (props) => {
 
     return (
         <div>
-            {loading && <div>Loading ...</div>}
-            {!loading && 
-                <div className="grid-container">
-                    <header className="header">
-                        <div className="header__search">
-                            <form onSubmit={onSubmit}>
-                                <input
-                                    name="deviceID"
-                                    value={deviceID}
-                                    onChange={onChange}
-                                    type="text"
-                                    placeholder="Add device" />
-                                    <button disabled={deviceID === ''} onClick={onSubmit} type="submit"> Add device </button>
-                            </form>
-                        </div>
-                        <div className="header__avatar">Your face</div>
-                    </header>
-    
+            
+            <div className="grid-container">
+                <header className="header">
+                    <div className="header__search">
+                        <form onSubmit={onSubmit}>
+                            <input
+                                name="deviceID"
+                                value={deviceID}
+                                onChange={onChange}
+                                type="text"
+                                placeholder="Add device" />
+                                <button disabled={deviceID === ''} onClick={onSubmit} type="submit"> Add device </button>
+                        </form>
+                    </div>
+                    <div className="header__avatar">Your face</div>
+                </header>
+                {loading && <main className="main">Loading ...</main>}
+                {!loading && 
                     <main className="main">
                         <Overview devices={devices}/>
                         <div className="main-cards">
@@ -87,13 +88,12 @@ const Home = (props) => {
                             <div className="card">Card</div>
                         </div>
                     </main>
-                    
-                    <footer className="footer">
-                        <div className="footer__copyright">&copy; 2019</div>
-                        <div className="footer__signature">Made in Norway</div>
-                    </footer>
-                </div>
-            }
+                }                
+                <footer className="footer">
+                    <div className="footer__copyright">&copy; 2019</div>
+                    <div className="footer__signature">Made in Norway</div>
+                </footer>
+            </div>
         </div>
     );
 }
