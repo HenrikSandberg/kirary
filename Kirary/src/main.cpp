@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <analogWrite.h>
+#include <NTPClient.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <SPI.h>
@@ -10,11 +11,16 @@
 #define FIREBASE_AUTH "OC47waZR7yjVfACbypdakuotyxwinkNLfqkGnV0I"
 
 //Wi-Fi connection
-const char* ssid = "Student"; //"HenriksNyeNettverk"; //
-const char* pass = "Kristiania1914"; //"G4rNAU6HwwuXXaDXwbEKovLGzhbq6Tq"; //
+const char* ssid = "HenriksNyeNettverk"; //"Student";
+const char* pass = "G4rNAU6HwwuXXaDXwbEKovLGzhbq6Tq"; //"Kristiania1914"; 
 
 WiFiClient espClient;
 FirebaseData firebaseData;
+FirebaseJson json;
+
+// Define NTP Client to get time
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
 
 //PINS
 const int motor_pin = 18;
@@ -23,6 +29,7 @@ const int moister_pin = 39;
 
 double celcius = 0.00;
 int moister_levle = 0;
+long last_log = 0l;
 
 int status = WL_IDLE_STATUS;
 String DEVICE_ID = "LM3299";
@@ -35,15 +42,45 @@ void update_temprature();
 void read_moister();
 void water_plant();
 void should_plant_get_water();
+void set_up_firebase();
+void set_up_time();
+void update_logs(String log_nam, String data);
+void check_for_upload_logs();
 
 void setup()
 {
   Serial.begin(9600);
+  
+  connect_to_wifi();
+  set_up_firebase();
+  set_up_time();
 }
 
 
-/*
-  connect_to_wifi();
+void loop()
+{
+  read_moister();
+  should_plant_get_water();
+  update_temprature();
+  check_for_upload_logs();
+  delay(100);
+}
+
+void set_up_time()
+{
+  // Initialize a NTPClient to get time
+  timeClient.begin();
+  
+  // Set offset time in seconds to adjust for your timezone, for example:
+  // GMT +1 = 3600
+  // GMT +8 = 28800
+  // GMT -1 = -3600
+  // GMT 0 = 0
+  timeClient.setTimeOffset(3600);
+}
+
+void set_up_firebase()
+{
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
 
@@ -52,20 +89,7 @@ void setup()
   
   //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
   Firebase.setwriteSizeLimit(firebaseData, "small");
-*/
-
-
-void loop()
-{
-  read_moister();
-  should_plant_get_water();
 }
-
-/*
-  update_temprature();
-  read_moister();
-  delay(1000);
-*/
 
 void connect_to_wifi()
 {
@@ -98,6 +122,31 @@ void water_plant()
   analogWrite(motor_pin, 255);
   delay(5000);
   analogWrite(motor_pin, 0);
+}
+
+void check_for_upload_logs()
+{
+  timeClient.update();
+  long current_time = timeClient.getEpochTime()/(60*60);
+
+  if (current_time > last_log)
+  {
+    update_logs("moister_log", moister_levle);
+    update_logs("celcius_log", celcius);
+    
+    //TODO: Add sunlight
+    //update_logs("moister_levle", String(moister_levle));
+
+    last_log = current_time;
+  }
+}
+
+void update_logs(String log_nam, int data)
+{
+  String log_key = timeClient.getFormattedDate();
+  //json.clear().add(log_key, data);
+  //Firebase.pushJSON(firebaseData, path + DEVICE_ID + "/" + log_nam, json);
+  Firebase.setInt(firebaseData, path + DEVICE_ID +"/"+log_nam+"/"+log_key, data);
 }
 
 void read_moister()
@@ -143,5 +192,5 @@ void push_temprature(double indata)
   celcius = indata;
   Serial.print(celcius);
   Serial.println("°C");
-  Firebase.setDouble(firebaseData, path + DEVICE_ID +"/temprature", celcius); //TODO: Maybe make history data here
+  Firebase.setDouble(firebaseData, path + DEVICE_ID +"/temprature", celcius);
 }
