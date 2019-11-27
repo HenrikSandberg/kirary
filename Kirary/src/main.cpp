@@ -53,6 +53,7 @@ void set_up_time();
 void update_logs(String log_nam, String data);
 void check_for_upload_logs();
 void read_light();
+void update_temprature(double measure);
 
 void setup()
 {
@@ -215,14 +216,18 @@ void read_temprature()
   measure = measure / number_of_rounds;
 
   if (celcius == 0.0)
-    celcius = measure;
-    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
+    update_temprature(measure);
 
   else if ((measure > celcius + 1.0) && (measure < celcius + 2.0))
-    celcius = measure;
-    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
+    update_temprature(measure);
     
   else if ((measure < celcius - 1.0) && (measure > celcius - 2.0))
-    celcius = measure;
-    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
+    update_temprature(measure);
+
+}
+
+void update_temprature(double measure)
+{
+  celcius = measure;
+  Firebase.setDouble(firebaseData, path +"/temprature", celcius);
 }

@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import { withFirebase } from '../Firebase';
-import { LineChart, AreaChart } from 'react-chartkick'
+import { LineChart, AreaChart, ColumnChart } from 'react-chartkick';
 import 'chart.js'
 
 import drop from '../../resources/icons/drop.svg';
 import temprature from '../../resources/icons/temprature.svg';
+import lightIcon from '../../resources/icons/sun.svg';
 
 const Home = (props) => {
     const [user, setUser] = useState(null);
@@ -33,6 +34,7 @@ const Home = (props) => {
         if (JSON.stringify(devices) !== (JSON.stringify(newDevices))) {
             setDevices([]);
             setDevices(newDevices);
+
             if (loading) setLoading(false);
         }
     }
@@ -43,7 +45,9 @@ const Home = (props) => {
             snapshot.forEach(childSnapshot => {
                 const data = childSnapshot.val();
                 props.firebase.device(data.uid).on('value', inner => {
-                    deviceList.push(inner.val());
+                    const device = {...inner.val(), uid: data.uid};
+
+                    deviceList.push(device);
                     updateDevices(deviceList);
                     setNumDevices(deviceList.length);
                 });
@@ -87,7 +91,9 @@ const Home = (props) => {
             {loading && <main className="main">Loading ...</main>}
             {!loading && 
                 <main className="main">
-                    <Overview devices={devices}/>
+                    <Overview 
+                        firebase={props.firebase}
+                        devices={devices}/>
                 </main>
             }                
             <footer className="footer">
@@ -98,11 +104,22 @@ const Home = (props) => {
     );
 }
 
-const Overview = ({devices}) => {
+const Overview = ({firebase, devices}) => {
     let count = 0;
+
+    const handleWaterClick = event => {
+        firebase.activateWater(event.target.value);
+    }
+    
     return (
         devices.map(device => (
             <div key={device.uid+String(count++)}>
+                <div className='device-header'>
+                    <span className='header-title'>
+                        Device: {device.uid}
+                    </span>
+                    <button value={device.uid} onClick={handleWaterClick}> Water plant </button>
+                </div>
                 <div className="main-overview">
                     {device.moister &&
                         <OverviewContent 
@@ -118,9 +135,9 @@ const Overview = ({devices}) => {
                     }      
                     {device.temprature &&
                         <OverviewContent 
-                            title={"Temprature"} 
-                            content={device.temprature}
-                            icon = {temprature}/>
+                            title={"Light"} 
+                            content={device.light}
+                            icon = {lightIcon}/>
                     }               
                 </div>
 
@@ -135,7 +152,14 @@ const Overview = ({devices}) => {
                                 title="Temprature"/>
                         </div>}
 
-                    <div className="card">Card</div>
+                    <div className="card">
+                        <ColumnChart 
+                            data={device.light_log} 
+                            height="500px" 
+                            width="90%" 
+                            colors={["#fdcb6e"]} 
+                            title="Light"/>
+                    </div>
 
                     {device.moister_log && 
                         <div className="card">
@@ -156,8 +180,8 @@ const Overview = ({devices}) => {
 const OverviewContent = ({key, title, content, icon}) => {
     const setBG = () => {
         if (title == "Moister") {
-            let color = (content < 2000) ? '#0984e3' : '#e17055';
-            content = content < 2000 ? 'Good' : 'Needs water';
+            let color = (content < 2500) ? '#0984e3' : '#e17055';
+            content = content < 2500 ? 'Good' : 'Needs water';
             return color;
 
         } else if (title == "Temprature") {
@@ -175,12 +199,24 @@ const OverviewContent = ({key, title, content, icon}) => {
             return backGroundColor;
 
         } else { 
-            /* TODO: When sunlight is added */ 
+            let backGroundColor = '';
+            if (content <= 0){
+                backGroundColor = '#2d3436';
+                content = "Low";
 
-            // Nothing
-            // Even less
-            // Less
-            // A LOT
+            } else if (content > 500 && content <= 1000) {
+                backGroundColor = '#636e72';
+                content = "medium";
+
+            } else if (content > 1000 && content <= 3000) {
+                backGroundColor = '#ffeaa7';
+                content = "Good";
+
+            } else {
+                backGroundColor = '#fdcb6e';
+                content = "High";
+            }
+            return backGroundColor;
         }
     }
 

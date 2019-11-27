@@ -62,7 +62,7 @@ class Firebase {
         })
     }
 
-    //TODO: Add delete device on user
+    activateWater = uid => this.db.ref(`devide/${uid}/watering`).set(true); //.child('watering')
 
     
 }
