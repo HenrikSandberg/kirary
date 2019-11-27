@@ -6,27 +6,28 @@
 #include <SPI.h>
 #include <FirebaseESP32.h>
 
-// Firebase setup
+// FIREBASE SETUP
 #define FIREBASE_HOST "kirary-fad13.firebaseio.com" 
 #define FIREBASE_AUTH "OC47waZR7yjVfACbypdakuotyxwinkNLfqkGnV0I"
 
-//Wi-Fi connection
+// WI-FI CONNECTION
 const char* ssid = "HenriksNyeNettverk"; //"Student";
 const char* pass = "G4rNAU6HwwuXXaDXwbEKovLGzhbq6Tq"; //"Kristiania1914"; 
 
 WiFiClient espClient;
 FirebaseData firebaseData;
-FirebaseJson json;
+FirebaseJson json; //TODO: Not needed now, may delete in future
 
-// Define NTP Client to get time
+// DEFINE NTP CLIENT TO GET TIME
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
-//PINS
+// PINS
 const int motor_pin = 18;
 const int temprature_pin = 34;
 const int moister_pin = 39;
 
+// VARIABLES
 double celcius = 0.00;
 int moister_levle = 0;
 long last_log = 0l;
@@ -35,7 +36,7 @@ int status = WL_IDLE_STATUS;
 String DEVICE_ID = "LM3299";
 String path = "/devide/";
 
-//Decleared functions
+// DECLEARD FUNCTIONS
 void connect_to_wifi();
 void push_temprature(double indata);
 void update_temprature();
@@ -50,32 +51,33 @@ void check_for_upload_logs();
 void setup()
 {
   Serial.begin(9600);
-  
   connect_to_wifi();
   set_up_firebase();
   set_up_time();
 }
 
-
 void loop()
 {
   read_moister();
   should_plant_get_water();
+  water_plant();
+
   update_temprature();
   check_for_upload_logs();
-  delay(100);
+  delay(1000);
 }
 
+// FUNCTION BODIES
+
+// Initialize a NTPClient to get time
+// Set offset time in seconds to adjust for your timezone, for example:
+// GMT +1 = 3600
+// GMT +8 = 28800
+// GMT -1 = -3600
+// GMT 0 = 0
 void set_up_time()
 {
-  // Initialize a NTPClient to get time
   timeClient.begin();
-  
-  // Set offset time in seconds to adjust for your timezone, for example:
-  // GMT +1 = 3600
-  // GMT +8 = 28800
-  // GMT -1 = -3600
-  // GMT 0 = 0
   timeClient.setTimeOffset(3600);
 }
 
@@ -85,7 +87,7 @@ void set_up_firebase()
   Firebase.reconnectWiFi(true);
 
   //Set database read timeout to 1 minute (max 15 minutes)
-  Firebase.setReadTimeout(firebaseData, 1000 * 60);
+  Firebase.setReadTimeout(firebaseData, 5000); //Minute 1000 * 60
   
   //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
   Firebase.setwriteSizeLimit(firebaseData, "small");
@@ -106,9 +108,9 @@ void connect_to_wifi()
 
 void should_plant_get_water()
 {
-  if (moister_levle >= 3000)
+  if (moister_levle >= 2500) //TODO: May have to set this limit to a lower levle
   {
-    water_plant();
+    // water_plant();
     Firebase.setBool(firebaseData, path + DEVICE_ID +"/watering", true);
   }
   else
@@ -117,11 +119,17 @@ void should_plant_get_water()
   } 
 }
 
-void water_plant()
+bool firebase_bool()
 {
-  analogWrite(motor_pin, 255);
-  delay(5000);
-  analogWrite(motor_pin, 0);
+  const bool fire_bool = Firebase.getBool(firebaseData, path + DEVICE_ID +"/watering");
+  return fire_bool;
+}
+
+void water_plant() //TODO: Maby this only this function should read bool from Firebase, and just change when value is changed there
+{
+  analogWrite(motor_pin, firebase_bool() ? 255 : 0);
+  // delay(5000);
+  // analogWrite(motor_pin, 0);
 }
 
 void check_for_upload_logs()
@@ -141,19 +149,21 @@ void check_for_upload_logs()
   }
 }
 
+//json.clear().add(log_key, data);
+//Firebase.pushJSON(firebaseData, path + DEVICE_ID + "/" + log_nam, json);
 void update_logs(String log_nam, int data)
 {
   String log_key = timeClient.getFormattedDate();
-  //json.clear().add(log_key, data);
-  //Firebase.pushJSON(firebaseData, path + DEVICE_ID + "/" + log_nam, json);
   Firebase.setInt(firebaseData, path + DEVICE_ID +"/"+log_nam+"/"+log_key, data);
 }
 
 void read_moister()
 {
   int val = analogRead(moister_pin);
-  Serial.print(val);
-  Serial.println(" moister");
+
+  // Serial.print(val);
+  // Serial.println(" moister");
+  
   if (val > moister_levle + 10) 
   {
     moister_levle = val;
@@ -169,7 +179,7 @@ void read_moister()
 void update_temprature()
 {
   double measure = 0.00;
-  int number_of_rounds = 100;
+  const int number_of_rounds = 100;
 
   for (int i = 0; i < number_of_rounds; i++)
   {
@@ -190,7 +200,7 @@ void update_temprature()
 void push_temprature(double indata)
 {
   celcius = indata;
-  Serial.print(celcius);
-  Serial.println("°C");
+  // Serial.print(celcius);
+  // Serial.println("°C");
   Firebase.setDouble(firebaseData, path + DEVICE_ID +"/temprature", celcius);
 }
