@@ -124,6 +124,8 @@
         vertical-align: middle;
         border: none;
         letter-spacing: 0.075em;
+        cursor:pointer;
+        outline: none;
 
         padding: 10px;
         box-shadow: $brand-box-shadow;
@@ -176,10 +178,10 @@
     padding: 24px;
     box-sizing: border-box;
     box-shadow: $brand-box-shadow;
-    background-color: $float-gray-color;
+    background-color: lighten($float-gray-color, 5%);
 
     &:nth-child(even) {
-        background-color: $secound-float-gray-color;
+        background-color: $float-gray-color;
     }
 
     &:first-child {

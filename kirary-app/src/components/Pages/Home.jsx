@@ -107,9 +107,7 @@ const Home = (props) => {
 const Overview = ({firebase, devices}) => {
     let count = 0;
 
-    const handleWaterClick = event => {
-        firebase.activateWater(event.target.value);
-    }
+    const handleWaterClick = event => firebase.activateWater(event.target.value);
     
     return (
         devices.map(device => (
@@ -202,11 +200,11 @@ const OverviewContent = ({key, title, content, icon}) => {
             let backGroundColor = '';
             if (content <= 500){
                 backGroundColor = '#2d3436';
-                content = "Low";
+                content = "None";
 
             } else if (content > 500 && content <= 1000) {
                 backGroundColor = '#e17055';
-                content = "medium";
+                content = "Low";
 
             } else if (content > 1000 && content <= 3000) {
                 backGroundColor = '#fdcb6e';

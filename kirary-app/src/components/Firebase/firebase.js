@@ -24,8 +24,10 @@ class Firebase {
             if (user) {
               return user;
             } 
-          });
+        });
     }
+
+    doDeleteAccount = () => this.getCurrentUser().delete().then(() => true).catch(() => false);
 
     doCreateUserWithEmailAndPassword = (email, password) =>
         this.auth.createUserWithEmailAndPassword(email, password);

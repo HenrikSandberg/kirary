@@ -31,6 +31,8 @@ const int light_pin = 35;
 double celcius = 0.00;
 int moister_levle = 0;
 long last_log = 0l;
+int moister_limit = 1000;
+const int MAX_MOISTER = 4000;
 
 int status = WL_IDLE_STATUS;
 String DEVICE_ID = "LM3299";
@@ -145,7 +147,7 @@ void read_light()
 
 void should_plant_get_water()
 {
-  Firebase.setBool(firebaseData, path + "/watering/", (moister_levle >= 2500));
+  Firebase.setBool(firebaseData, path + "/watering/", (moister_levle <= moister_limit));
 }
 
 bool firebase_bool()
@@ -170,7 +172,7 @@ void check_for_upload_logs()
 
   if (current_time > last_log)
   {
-    update_logs("moister_log", moister_levle);
+    update_logs("moister_log", MAX_MOISTER-moister_levle);
     update_logs("celcius_log", celcius);
     update_logs("light_log", average_light);
 
@@ -191,13 +193,13 @@ void read_moister()
   if (val > moister_levle + 10) 
   {
     moister_levle = val;
-    Firebase.setInt(firebaseData, path + "/moister", moister_levle);
+    Firebase.setInt(firebaseData, path + "/moister", MAX_MOISTER-moister_levle);
     should_plant_get_water();
   } 
   else if (val < moister_levle - 10) 
   {
     moister_levle = val;
-    Firebase.setInt(firebaseData, path + "/moister", moister_levle);
+    Firebase.setInt(firebaseData, path + "/moister", MAX_MOISTER-moister_levle);
     should_plant_get_water();
   }
 }

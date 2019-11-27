@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default () => (
-    <div>
+    <div style={{backgroundColor: '#fff', margin: '0'}}>
         <h1>Landing Page</h1>
     </div>
 )

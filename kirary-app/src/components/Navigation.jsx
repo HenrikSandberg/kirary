@@ -8,13 +8,9 @@ import { AuthUserContext } from './Session';
 import logo from '../resources/images/logo.png';
 
 const Navigation = () => (
-  <div>
-    <AuthUserContext.Consumer>
-      {authUser =>
-        authUser ? <NavigationAuth /> : <NavigationNonAuth />
-      }
-    </AuthUserContext.Consumer>
-  </div>
+  <AuthUserContext.Consumer>
+    {authUser => authUser ? <NavigationAuth /> : <NavigationNonAuth />}
+  </AuthUserContext.Consumer>
 );
 
 const NavigationAuth = () => (
@@ -42,7 +38,9 @@ const NavigationNonAuth = () => (
   <nav className="navigation">
     <ul className="menu">
       <li>
-        <Link to={ROUTES.LANDING}>Landing</Link>
+        <Link to={ROUTES.LANDING}>
+            <img src={logo} className='brand-logo'/>
+        </Link>
       </li>
       <li>
         <Link to={ROUTES.SIGN_IN}>Sign In</Link>
