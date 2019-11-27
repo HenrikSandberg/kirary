@@ -34,11 +34,10 @@ long last_log = 0l;
 
 int status = WL_IDLE_STATUS;
 String DEVICE_ID = "LM3299";
-String path = "/devide/";
+String path = "/devide/" + DEVICE_ID;
 
 // DECLEARD FUNCTIONS
 void connect_to_wifi();
-void push_temprature(double indata);
 void update_temprature();
 void read_moister();
 void water_plant();
@@ -59,7 +58,7 @@ void setup()
 void loop()
 {
   read_moister();
-  should_plant_get_water();
+  //should_plant_get_water();
   water_plant();
 
   update_temprature();
@@ -78,7 +77,7 @@ void loop()
 void set_up_time()
 {
   timeClient.begin();
-  timeClient.setTimeOffset(3600);
+  timeClient.setTimeOffset(3600*2);
 }
 
 void set_up_firebase()
@@ -87,7 +86,7 @@ void set_up_firebase()
   Firebase.reconnectWiFi(true);
 
   //Set database read timeout to 1 minute (max 15 minutes)
-  Firebase.setReadTimeout(firebaseData, 5000); //Minute 1000 * 60
+  Firebase.setReadTimeout(firebaseData, 1000*60); //Minute 1000 * 60
   
   //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
   Firebase.setwriteSizeLimit(firebaseData, "small");
@@ -108,28 +107,22 @@ void connect_to_wifi()
 
 void should_plant_get_water()
 {
-  if (moister_levle >= 2500) //TODO: May have to set this limit to a lower levle
-  {
-    // water_plant();
-    Firebase.setBool(firebaseData, path + DEVICE_ID +"/watering", true);
-  }
-  else
-  {
-    Firebase.setBool(firebaseData, path + DEVICE_ID +"/watering", false);
-  } 
+  Firebase.setBool(firebaseData, path + "/watering/", (moister_levle >= 2500));
 }
 
 bool firebase_bool()
 {
-  const bool fire_bool = Firebase.getBool(firebaseData, path + DEVICE_ID +"/watering");
-  return fire_bool;
+  if (Firebase.getBool(firebaseData, path + "/watering"))
+  {
+    return firebaseData.boolData();
+  }
+  return false;
 }
 
-void water_plant() //TODO: Maby this only this function should read bool from Firebase, and just change when value is changed there
+void water_plant()
 {
   analogWrite(motor_pin, firebase_bool() ? 255 : 0);
-  // delay(5000);
-  // analogWrite(motor_pin, 0);
+  delay(5000);
 }
 
 void check_for_upload_logs()
@@ -149,30 +142,27 @@ void check_for_upload_logs()
   }
 }
 
-//json.clear().add(log_key, data);
-//Firebase.pushJSON(firebaseData, path + DEVICE_ID + "/" + log_nam, json);
 void update_logs(String log_nam, int data)
 {
   String log_key = timeClient.getFormattedDate();
-  Firebase.setInt(firebaseData, path + DEVICE_ID +"/"+log_nam+"/"+log_key, data);
+  Firebase.setInt(firebaseData, path + "/"+log_nam+"/"+log_key, data);
 }
 
 void read_moister()
 {
   int val = analogRead(moister_pin);
-
-  // Serial.print(val);
-  // Serial.println(" moister");
   
   if (val > moister_levle + 10) 
   {
     moister_levle = val;
-    Firebase.setInt(firebaseData, path + DEVICE_ID +"/moister", moister_levle);
+    Firebase.setInt(firebaseData, path + "/moister", moister_levle);
+    should_plant_get_water();
   } 
   else if (val < moister_levle - 10) 
   {
     moister_levle = val;
-    Firebase.setInt(firebaseData, path + DEVICE_ID +"/moister", moister_levle);
+    Firebase.setInt(firebaseData, path + "/moister", moister_levle);
+    should_plant_get_water();
   }
 }
 
@@ -190,17 +180,11 @@ void update_temprature()
   measure = measure / number_of_rounds;
 
   if (celcius == 0.0)
-    push_temprature(measure);
-  else if ((measure > celcius + 1.0) && (measure < celcius + 2.0))
-    push_temprature(measure);
-  else if ((measure < celcius - 1.0) && (measure > celcius - 2.0))
-    push_temprature(measure);
-}
+    Firebase.setDouble(firebaseData, path +"/temprature", measure);
 
-void push_temprature(double indata)
-{
-  celcius = indata;
-  // Serial.print(celcius);
-  // Serial.println("°C");
-  Firebase.setDouble(firebaseData, path + DEVICE_ID +"/temprature", celcius);
+  else if ((measure > celcius + 1.0) && (measure < celcius + 2.0))
+    Firebase.setDouble(firebaseData, path +"/temprature", measure);
+    
+  else if ((measure < celcius - 1.0) && (measure > celcius - 2.0))
+    Firebase.setDouble(firebaseData, path +"/temprature", measure);
 }
