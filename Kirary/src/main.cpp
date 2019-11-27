@@ -16,7 +16,6 @@ const char* pass = "G4rNAU6HwwuXXaDXwbEKovLGzhbq6Tq"; //"Kristiania1914";
 
 WiFiClient espClient;
 FirebaseData firebaseData;
-FirebaseJson json; //TODO: Not needed now, may delete in future
 
 // DEFINE NTP CLIENT TO GET TIME
 WiFiUDP ntpUDP;
@@ -26,6 +25,7 @@ NTPClient timeClient(ntpUDP);
 const int motor_pin = 18;
 const int temprature_pin = 34;
 const int moister_pin = 39;
+const int light_pin = 35;
 
 // VARIABLES
 double celcius = 0.00;
@@ -36,9 +36,15 @@ int status = WL_IDLE_STATUS;
 String DEVICE_ID = "LM3299";
 String path = "/devide/" + DEVICE_ID;
 
+const int num_readings = 10;
+int readings[num_readings];
+int read_index = 0;
+int total = 0;
+int average_light = 0;
+
 // DECLEARD FUNCTIONS
 void connect_to_wifi();
-void update_temprature();
+void read_temprature();
 void read_moister();
 void water_plant();
 void should_plant_get_water();
@@ -46,6 +52,7 @@ void set_up_firebase();
 void set_up_time();
 void update_logs(String log_nam, String data);
 void check_for_upload_logs();
+void read_light();
 
 void setup()
 {
@@ -53,15 +60,20 @@ void setup()
   connect_to_wifi();
   set_up_firebase();
   set_up_time();
+
+  for (int thisReading = 0; thisReading < num_readings; thisReading++) {
+    readings[thisReading] = 0;
+  }
 }
 
 void loop()
 {
   read_moister();
-  //should_plant_get_water();
+  read_light();
+  read_temprature();
+
   water_plant();
 
-  update_temprature();
   check_for_upload_logs();
   delay(1000);
 }
@@ -77,7 +89,7 @@ void loop()
 void set_up_time()
 {
   timeClient.begin();
-  timeClient.setTimeOffset(3600*2);
+  timeClient.setTimeOffset(3600);
 }
 
 void set_up_firebase()
@@ -103,6 +115,31 @@ void connect_to_wifi()
   }
   
   Serial.println("Wi-fi is now connected");
+}
+
+void read_light()
+{
+  const int last_reading = average_light;
+
+  total = total - readings[read_index];
+  readings[read_index] = analogRead(light_pin);
+  total = total + readings[read_index];
+  read_index = read_index + 1;
+
+  if (read_index >= num_readings) {
+    read_index = 0;
+  }
+
+  average_light = total / num_readings;
+
+  if (average_light > last_reading+10)
+  {
+    Firebase.setInt(firebaseData, path + "/light", average_light);
+  } 
+  else if (average_light < last_reading - 10)
+  {
+    Firebase.setInt(firebaseData, path + "/light", average_light);
+  }
 }
 
 void should_plant_get_water()
@@ -134,9 +171,7 @@ void check_for_upload_logs()
   {
     update_logs("moister_log", moister_levle);
     update_logs("celcius_log", celcius);
-    
-    //TODO: Add sunlight
-    //update_logs("moister_levle", String(moister_levle));
+    update_logs("light_log", average_light);
 
     last_log = current_time;
   }
@@ -144,7 +179,7 @@ void check_for_upload_logs()
 
 void update_logs(String log_nam, int data)
 {
-  String log_key = timeClient.getFormattedDate();
+  String log_key = String(timeClient.getFormattedDate());
   Firebase.setInt(firebaseData, path + "/"+log_nam+"/"+log_key, data);
 }
 
@@ -166,7 +201,7 @@ void read_moister()
   }
 }
 
-void update_temprature()
+void read_temprature()
 {
   double measure = 0.00;
   const int number_of_rounds = 100;
@@ -180,11 +215,14 @@ void update_temprature()
   measure = measure / number_of_rounds;
 
   if (celcius == 0.0)
-    Firebase.setDouble(firebaseData, path +"/temprature", measure);
+    celcius = measure;
+    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
 
   else if ((measure > celcius + 1.0) && (measure < celcius + 2.0))
-    Firebase.setDouble(firebaseData, path +"/temprature", measure);
+    celcius = measure;
+    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
     
   else if ((measure < celcius - 1.0) && (measure > celcius - 2.0))
-    Firebase.setDouble(firebaseData, path +"/temprature", measure);
+    celcius = measure;
+    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
 }
