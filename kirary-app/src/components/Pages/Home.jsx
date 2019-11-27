@@ -200,20 +200,20 @@ const OverviewContent = ({key, title, content, icon}) => {
 
         } else { 
             let backGroundColor = '';
-            if (content <= 0){
+            if (content <= 500){
                 backGroundColor = '#2d3436';
                 content = "Low";
 
             } else if (content > 500 && content <= 1000) {
-                backGroundColor = '#636e72';
+                backGroundColor = '#e17055';
                 content = "medium";
 
             } else if (content > 1000 && content <= 3000) {
-                backGroundColor = '#ffeaa7';
+                backGroundColor = '#fdcb6e';
                 content = "Good";
 
             } else {
-                backGroundColor = '#fdcb6e';
+                backGroundColor = '#e17055';
                 content = "High";
             }
             return backGroundColor;
