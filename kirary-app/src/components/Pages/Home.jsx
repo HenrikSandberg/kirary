@@ -131,7 +131,7 @@ const Overview = ({firebase, devices}) => {
                             content={device.temprature}
                             icon = {temprature}/>
                     }      
-                    {device.temprature &&
+                    {device.light &&
                         <OverviewContent 
                             title={"Light"} 
                             content={device.light}
@@ -180,8 +180,8 @@ const Overview = ({firebase, devices}) => {
 const OverviewContent = ({key, title, content, icon}) => {
     const setBG = () => {
         if (title == "Moister") {
-            let color = (content < 2500) ? '#0984e3' : '#e17055';
-            content = content < 2500 ? 'Good' : 'Needs water';
+            let color = (content < 1500) ? '#0984e3' : '#e17055';
+            content = content < 1500 ? 'Good' : 'Needs water';
             return color;
 
         } else if (title == "Temprature") {

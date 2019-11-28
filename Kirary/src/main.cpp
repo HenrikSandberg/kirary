@@ -32,7 +32,6 @@ const int water_storeage_pin = 33;
 double celcius = 0.00;
 int moister_levle = 0;
 long last_log = 0l;
-int moister_limit = 1500;
 int water_tank_reading = 0;
 const int MAX_MOISTER = 4095;
 
@@ -71,12 +70,11 @@ void setup()
   }
 }
 
+/* update_light(); */
 void loop()
 {
   read_moister();
   read_temprature();
-
-  update_light();
   update_water_tank();
 
   water_plant();
@@ -203,7 +201,7 @@ void check_for_upload_logs()
   {
     update_logs("moister_log", moister_levle);
     update_logs("celcius_log", celcius);
-    update_logs("light_log", average_light);
+    //update_logs("light_log", average_light);
 
     last_log = current_time;
   }
@@ -244,18 +242,19 @@ void read_temprature()
   }
 
   measure = measure / number_of_rounds;
+  Serial.println(measure);
 
   if (celcius == 0.0)
   {
     celcius = measure;
     Firebase.setDouble(firebaseData, path +"/temprature", celcius);
   }
-  else if (measure > celcius + 1.0) //&& (measure < celcius + 2.0))
+  else if (measure > celcius + 0.5)
   {
     celcius = measure;
     Firebase.setDouble(firebaseData, path +"/temprature", celcius);
   }
-  else if (measure < celcius - 1.0) //&& (measure > celcius - 2.0))
+  else if (measure < celcius - 0.5)
   {
     celcius = measure;
     Firebase.setDouble(firebaseData, path +"/temprature", celcius);

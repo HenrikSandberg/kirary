@@ -15,6 +15,7 @@ exports.waterPlant = functions.database
         
             if (maxWater === undefined || maxWater === null) {
                 maxWater = 1500;
+                snapshot.after.ref.update({maxWater: maxWater});
             }
     
             if (after.water_storeage <= 1100) {
