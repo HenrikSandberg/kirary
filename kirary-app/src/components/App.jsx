@@ -14,7 +14,7 @@ import { withAuthentication } from './Session';
 
 const App = () => (
     <Router>
-        <div>
+        <div style={{margin: '-20px 0'}}>
             <Navigation/>
             <Switch>
                 <Route path={ROUTES.ACCOUNT} component={Account} />

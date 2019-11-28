@@ -66,6 +66,5 @@ class Firebase {
 
     activateWater = uid => this.db.ref(`devide/${uid}/watering`).set(true); //.child('watering')
 
-    
 }
 export default Firebase;

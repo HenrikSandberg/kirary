@@ -150,14 +150,16 @@ const Overview = ({firebase, devices}) => {
                                 title="Temprature"/>
                         </div>}
 
-                    <div className="card">
-                        <ColumnChart 
-                            data={device.light_log} 
-                            height="500px" 
-                            width="90%" 
-                            colors={["#fdcb6e"]} 
-                            title="Light"/>
-                    </div>
+                    {device.light_log && 
+                        <div className="card">
+                            <AreaChart 
+                                data={device.light_log} 
+                                height="500px" 
+                                width="90%" 
+                                colors={["#fdcb6e"]} 
+                                title="Light"/>
+                        </div>
+                    }
 
                     {device.moister_log && 
                         <div className="card">
@@ -206,7 +208,7 @@ const OverviewContent = ({key, title, content, icon}) => {
                 backGroundColor = '#e17055';
                 content = "Low";
 
-            } else if (content > 1000 && content <= 3000) {
+            } else if (content > 1000 && content <= 4200) {
                 backGroundColor = '#fdcb6e';
                 content = "Good";
 

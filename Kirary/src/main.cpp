@@ -11,8 +11,8 @@
 #define FIREBASE_AUTH "OC47waZR7yjVfACbypdakuotyxwinkNLfqkGnV0I"
 
 // WI-FI CONNECTION
-const char* ssid = "HenriksNyeNettverk"; //"Student";
-const char* pass = "G4rNAU6HwwuXXaDXwbEKovLGzhbq6Tq"; //"Kristiania1914"; 
+const char* ssid =  "Student"; // "HenriksNyeNettverk";
+const char* pass =  "Kristiania1914"; //"G4rNAU6HwwuXXaDXwbEKovLGzhbq6Tq"; 
 
 WiFiClient espClient;
 FirebaseData firebaseData;
@@ -26,16 +26,18 @@ const int motor_pin = 18;
 const int temprature_pin = 34;
 const int moister_pin = 39;
 const int light_pin = 35;
+const int water_storeage_pin = 33;
 
 // VARIABLES
 double celcius = 0.00;
 int moister_levle = 0;
 long last_log = 0l;
-int moister_limit = 1000;
-const int MAX_MOISTER = 4000;
+int moister_limit = 1500;
+int water_tank_reading = 0;
+const int MAX_MOISTER = 4095;
 
 int status = WL_IDLE_STATUS;
-String DEVICE_ID = "LM3299";
+String DEVICE_ID = "LM3429";
 String path = "/devide/" + DEVICE_ID;
 
 const int num_readings = 10;
@@ -49,13 +51,13 @@ void connect_to_wifi();
 void read_temprature();
 void read_moister();
 void water_plant();
-void should_plant_get_water();
+bool should_plant_get_water();
 void set_up_firebase();
 void set_up_time();
 void update_logs(String log_nam, String data);
 void check_for_upload_logs();
-void read_light();
-void update_temprature(double measure);
+void update_light();
+void update_water_tank();
 
 void setup()
 {
@@ -72,8 +74,10 @@ void setup()
 void loop()
 {
   read_moister();
-  read_light();
   read_temprature();
+
+  update_light();
+  update_water_tank();
 
   water_plant();
 
@@ -101,7 +105,7 @@ void set_up_firebase()
   Firebase.reconnectWiFi(true);
 
   //Set database read timeout to 1 minute (max 15 minutes)
-  Firebase.setReadTimeout(firebaseData, 1000*60); //Minute 1000 * 60
+  Firebase.setReadTimeout(firebaseData, 1000*15); //Minute 1000 * 60
   
   //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
   Firebase.setwriteSizeLimit(firebaseData, "small");
@@ -114,13 +118,13 @@ void connect_to_wifi()
     Serial.print("Attempting to connect to WPA SSID: ");
     Serial.println(ssid);
     status = WiFi.begin(ssid, pass);
-    delay(10000);
+    delay(5000);
   }
   
   Serial.println("Wi-fi is now connected");
 }
 
-void read_light()
+void update_light()
 {
   const int last_reading = average_light;
 
@@ -129,28 +133,24 @@ void read_light()
   total = total + readings[read_index];
   read_index = read_index + 1;
 
-  if (read_index >= num_readings) {
+  if (read_index >= num_readings) 
+  {
     read_index = 0;
   }
 
   average_light = total / num_readings;
 
-  if (average_light > last_reading+10)
+  if (average_light > last_reading + 50)
   {
     Firebase.setInt(firebaseData, path + "/light", average_light);
   } 
-  else if (average_light < last_reading - 10)
+  else if (average_light < last_reading - 50)
   {
     Firebase.setInt(firebaseData, path + "/light", average_light);
   }
 }
 
-void should_plant_get_water()
-{
-  Firebase.setBool(firebaseData, path + "/watering/", (moister_levle <= moister_limit));
-}
-
-bool firebase_bool()
+bool should_plant_get_water()
 {
   if (Firebase.getBool(firebaseData, path + "/watering"))
   {
@@ -159,10 +159,39 @@ bool firebase_bool()
   return false;
 }
 
+void update_water_tank()
+{
+  int measure = 0;
+  const int number_of_rounds = 100;
+
+  for (int i = 0; i < number_of_rounds; i++)
+  {
+    measure += analogRead(water_storeage_pin);
+    delay(10);
+  }
+
+  const int read_water = measure / number_of_rounds;
+
+  if (read_water > water_tank_reading + 50)
+  {
+    water_tank_reading = read_water;
+    Firebase.setInt(firebaseData, path + "/water_storeage", water_tank_reading);
+  } 
+  else if (read_water < water_tank_reading - 50)
+  {
+    water_tank_reading = read_water;
+    Firebase.setInt(firebaseData, path + "/water_storeage", water_tank_reading);
+  }
+}
+
 void water_plant()
 {
-  analogWrite(motor_pin, firebase_bool() ? 255 : 0);
-  delay(5000);
+  if (should_plant_get_water())
+  {
+    analogWrite(motor_pin, 255);
+    delay(5000);
+  }
+  analogWrite(motor_pin, 0);
 }
 
 void check_for_upload_logs()
@@ -172,7 +201,7 @@ void check_for_upload_logs()
 
   if (current_time > last_log)
   {
-    update_logs("moister_log", MAX_MOISTER-moister_levle);
+    update_logs("moister_log", moister_levle);
     update_logs("celcius_log", celcius);
     update_logs("light_log", average_light);
 
@@ -188,19 +217,18 @@ void update_logs(String log_nam, int data)
 
 void read_moister()
 {
-  int val = analogRead(moister_pin);
+  int moister_reading = analogRead(moister_pin);
+  moister_reading = MAX_MOISTER - moister_reading;
   
-  if (val > moister_levle + 10) 
+  if (moister_reading > moister_levle + 50) 
   {
-    moister_levle = val;
-    Firebase.setInt(firebaseData, path + "/moister", MAX_MOISTER-moister_levle);
-    should_plant_get_water();
+    moister_levle = moister_reading;
+    Firebase.setInt(firebaseData, path + "/moister", moister_levle);
   } 
-  else if (val < moister_levle - 10) 
+  else if (moister_reading < moister_levle - 50) 
   {
-    moister_levle = val;
-    Firebase.setInt(firebaseData, path + "/moister", MAX_MOISTER-moister_levle);
-    should_plant_get_water();
+    moister_levle = moister_reading;
+    Firebase.setInt(firebaseData, path + "/moister", moister_levle);
   }
 }
 
@@ -218,18 +246,19 @@ void read_temprature()
   measure = measure / number_of_rounds;
 
   if (celcius == 0.0)
-    update_temprature(measure);
+  {
+    celcius = measure;
+    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
+  }
+  else if (measure > celcius + 1.0) //&& (measure < celcius + 2.0))
+  {
+    celcius = measure;
+    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
+  }
+  else if (measure < celcius - 1.0) //&& (measure > celcius - 2.0))
+  {
+    celcius = measure;
+    Firebase.setDouble(firebaseData, path +"/temprature", celcius);
+  }
 
-  else if ((measure > celcius + 1.0) && (measure < celcius + 2.0))
-    update_temprature(measure);
-    
-  else if ((measure < celcius - 1.0) && (measure > celcius - 2.0))
-    update_temprature(measure);
-
-}
-
-void update_temprature(double measure)
-{
-  celcius = measure;
-  Firebase.setDouble(firebaseData, path +"/temprature", celcius);
 }
