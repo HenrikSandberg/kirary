@@ -11,18 +11,18 @@ exports.waterPlant = functions.database
         const prevMoister = prev.moister;
 
         if (moister !== prevMoister) {
-            let maxWater = after.minimum_water;
+            let minimumWater = after.minimum_water;
         
-            if (maxWater === undefined || maxWater === null) {
-                maxWater = 1500;
-                snapshot.after.ref.update({maxWater: maxWater});
+            if (minimumWater === undefined || minimumWater === null) {
+                minimumWater = 1500;
+                snapshot.after.ref.update({maxWater: minimumWater});
             }
     
             if (after.water_storeage <= 1100) {
                 return snapshot.after.ref.update({watering: false});
             }
     
-            return snapshot.after.ref.update({watering: (moister <= maxWater)});
+            return snapshot.after.ref.update({watering: (moister <= minimumWater)});
         }
 
 

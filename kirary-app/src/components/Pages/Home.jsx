@@ -1,11 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { withFirebase } from '../Firebase';
-import { LineChart, AreaChart, ColumnChart } from 'react-chartkick';
-import 'chart.js'
 
-import drop from '../../resources/icons/drop.svg';
-import temprature from '../../resources/icons/temprature.svg';
-import lightIcon from '../../resources/icons/sun.svg';
+import Overview from '../SimpleComponents/Overview';
 
 const Home = (props) => {
     const [user, setUser] = useState(null);
@@ -46,10 +42,19 @@ const Home = (props) => {
                 const data = childSnapshot.val();
                 props.firebase.device(data.uid).on('value', inner => {
                     const device = {...inner.val(), uid: data.uid};
+                    let add = true;
+                    
+                    deviceList.forEach(item => {
+                        if (item.uid === device.uid) {
+                            add = false;
+                        }
+                    });
 
-                    deviceList.push(device);
-                    updateDevices(deviceList);
-                    setNumDevices(deviceList.length);
+                    if (add) {
+                        deviceList.push(device);
+                        updateDevices(deviceList);
+                        setNumDevices(deviceList.length);
+                    }
                 });
             });
         });
@@ -79,7 +84,7 @@ const Home = (props) => {
                             placeholder="Add device" />
                             <button 
                                 className='add_new_device_button'
-                                for='input' 
+                                htmlFor='input' 
                                 disabled={deviceID === ''} 
                                 onClick={onSubmit} 
                                 type="submit"> 
@@ -91,9 +96,12 @@ const Home = (props) => {
             {loading && <main className="main">Loading ...</main>}
             {!loading && 
                 <main className="main">
-                    <Overview 
-                        firebase={props.firebase}
-                        devices={devices}/>
+                    {devices.map(device => 
+                            <Overview 
+                                key={device.uid}
+                                device={device}
+                                firebase={props.firebase}/>
+                    )}
                 </main>
             }                
             <footer className="footer">
@@ -104,130 +112,5 @@ const Home = (props) => {
     );
 }
 
-const Overview = ({firebase, devices}) => {
-    let count = 0;
 
-    const handleWaterClick = event => firebase.activateWater(event.target.value);
-    
-    return (
-        devices.map(device => (
-            <div key={device.uid+String(count++)}>
-                <div className='device-header'>
-                    <span className='header-title'>
-                        Device: {device.uid}
-                    </span>
-                    <button value={device.uid} onClick={handleWaterClick}> Water plant </button>
-                </div>
-                <div className="main-overview">
-                    {device.moister &&
-                        <OverviewContent 
-                            title={"Moister"} 
-                            content={device.moister}
-                            icon={drop}/>
-                    }
-                    {device.temprature &&
-                        <OverviewContent 
-                            title={"Temprature"} 
-                            content={device.temprature}
-                            icon = {temprature}/>
-                    }      
-                    {device.light &&
-                        <OverviewContent 
-                            title={"Light"} 
-                            content={device.light}
-                            icon = {lightIcon}/>
-                    }               
-                </div>
-
-                <div className="main-cards">
-                    {device.celcius_log && 
-                        <div className="card">
-                            <LineChart 
-                                data={device.celcius_log} 
-                                height="300px" 
-                                width="90%" 
-                                colors={["#00b894"]} 
-                                title="Temprature"/>
-                        </div>}
-
-                    {device.light_log && 
-                        <div className="card">
-                            <AreaChart 
-                                data={device.light_log} 
-                                height="500px" 
-                                width="90%" 
-                                colors={["#fdcb6e"]} 
-                                title="Light"/>
-                        </div>
-                    }
-
-                    {device.moister_log && 
-                        <div className="card">
-                            <AreaChart 
-                                data={device.moister_log} 
-                                height="500px" 
-                                width="90%" 
-                                colors={["#0984e3"]} 
-                                title="Water"/>
-                        </div>}
-
-                </div>
-            </div>
-        ))
-    );
-}
-
-const OverviewContent = ({key, title, content, icon}) => {
-    const setBG = () => {
-        if (title == "Moister") {
-            let color = (content < 1500) ? '#0984e3' : '#e17055';
-            content = content < 1500 ? 'Good' : 'Needs water';
-            return color;
-
-        } else if (title == "Temprature") {
-            let backGroundColor = '';
-            if (content <= 0){
-                backGroundColor = '#81ecec';
-            } else if (content > 0 && content <= 10.5) {
-                backGroundColor = '#55efc4';
-            } else if (content > 10.5 && content <= 30) {
-                backGroundColor = '#00b894';
-            } else {
-                backGroundColor = '#e17055';
-            }
-            content = content.toFixed(2) + "°C";
-            return backGroundColor;
-
-        } else { 
-            let backGroundColor = '';
-            if (content <= 500){
-                backGroundColor = '#2d3436';
-                content = "None";
-
-            } else if (content > 500 && content <= 1000) {
-                backGroundColor = '#e17055';
-                content = "Low";
-
-            } else if (content > 1000 && content <= 4200) {
-                backGroundColor = '#fdcb6e';
-                content = "Good";
-
-            } else {
-                backGroundColor = '#e17055';
-                content = "High";
-            }
-            return backGroundColor;
-        }
-    }
-
-    return (
-        <div className="overviewcard" key={key} style={{backgroundColor: setBG()}}>      
-            <div>
-                <div className="info">{content}</div>
-                <div className="title">{title}</div>
-            </div>  
-            <img src={icon} alt-text='icon' className='overview-icon'/>
-        </div>
-    );
-}
 export default withFirebase(Home);

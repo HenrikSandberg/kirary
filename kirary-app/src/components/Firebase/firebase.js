@@ -41,16 +41,26 @@ class Firebase {
     
     doPasswordUpdate = password => this.auth.currentUser.updatePassword(password);
 
-    //TODO: Add delete account
-
 
     //DATABASE GET
     user = uid => this.db.ref(`users/${uid}`);
     users = () => this.db.ref('users');
     devices = () => this.db.ref('devide');
     device = uid => this.db.ref(`devide/${uid}`);
+    plants = () => this.db.ref('plants/');
     
     getDevicesFromUser = uid => this.db.ref(`users/${uid}/devides`);
+    
+    setPlant = (uid, plantName) => {
+        if (plantName === null) {
+            this.db.ref(`devide/${uid}/plant_type`).set(plantName);
+        } else {
+            this.db.ref(`plants/${plantName}`).on('value', snap => {
+                this.db.ref(`devide/${uid}/plant_type`).set(plantName);
+                this.db.ref(`devide/${uid}/minimum_water`).set(snap.val());
+            });
+        }
+    }
 
     addDeviceToUnser = (uid, deviceUid) => {
         this.device(deviceUid).on('value', snapshot => {
