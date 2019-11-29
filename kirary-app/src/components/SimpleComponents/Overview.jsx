@@ -20,13 +20,8 @@ const Overview = ({firebase, device}) => {
 
     const onSelect = (event) => {
         const content = event.target.value;
-
-        if (content === "") {
-            console.log('Empty string')
-        } else {
-            setSelected(content);
-            firebase.setPlant(device.uid, content);
-        }
+        setSelected(content);
+        firebase.setPlant(device.uid, content);
     }
 
     const removeSelectedPlant = () => {
