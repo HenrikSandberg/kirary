@@ -68,25 +68,27 @@ const Overview = ({firebase, device}) => {
 
             <div className="main-cards">
 
-                {device.water_storeage && 
-                    <div className="card action-card" style={{backgroundColor: '#000'}}>
+                {device.water_storeage >= 0 && 
+                    <div className={"card action-card " + (device.water_storeage > 500 ? "full" : "empty")}>
                         <div className='device-name'>
                             Device: {device.uid}
                         </div>
                         <div className='water-text'>
-                            {(device.water_storeage > 1100 ? "Enough water" : "Need to refill") }
+                            {(device.water_storeage > 500 ? "Enough water" : "Need to refill") }
                         </div>
                         {!selected && plants ?
-                            <select id = "select-plant" onChange={onSelect}>
-                                <option value="" disabled selected hidden>Choose a plant</option>
-                                {Object.keys(plants).map((key, value) => 
-                                    <option 
-                                        key={key} 
-                                        value={key}>
-                                            {capitalize(key)}
-                                    </option>)}
-                            </select>
-                            : <div> 
+                            <div className='main-focus-action'>
+                                <select onChange={onSelect}>
+                                    <option value="" disabled selected hidden>Choose a plant</option>
+                                    {Object.keys(plants).map((key, value) => 
+                                        <option 
+                                            key={key} 
+                                            value={key}>
+                                                {capitalize(key)}
+                                        </option>)}
+                                </select>
+                            </div>
+                            : <div className='main-focus-action'> 
                                 <div className='selected-plant-name'>
                                     {capitalize(selected)}
                                 </div>
@@ -97,10 +99,14 @@ const Overview = ({firebase, device}) => {
                                 </button>
                             </div>
                         }
-
-                        <img src={(device.water_storeage > 1100 ? full : empty)} alt-text='icon'/>
+                        <div className='water-icon'>
+                            <img 
+                                src={(device.water_storeage > 500 ? full : empty)} 
+                                alt-text='icon'/>
+                        </div>
                         <button 
-                            disabled={device.water_storeage < 1100}
+                            className='water-plant-button'
+                            disabled={device.water_storeage < 500}
                             value={device.uid} 
                             onClick={handleWaterClick}> 
                                 Water plant 

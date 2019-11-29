@@ -18,7 +18,7 @@ exports.waterPlant = functions.database
                 snapshot.after.ref.update({maxWater: minimumWater});
             }
     
-            if (after.water_storeage <= 1100) {
+            if (after.water_storeage <= 500) {
                 return snapshot.after.ref.update({watering: false});
             }
     

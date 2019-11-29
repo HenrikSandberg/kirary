@@ -42,19 +42,10 @@ const Home = (props) => {
                 const data = childSnapshot.val();
                 props.firebase.device(data.uid).on('value', inner => {
                     const device = {...inner.val(), uid: data.uid};
-                    let add = true;
-                    
-                    deviceList.forEach(item => {
-                        if (item.uid === device.uid) {
-                            add = false;
-                        }
-                    });
 
-                    if (add) {
-                        deviceList.push(device);
-                        updateDevices(deviceList);
-                        setNumDevices(deviceList.length);
-                    }
+                    deviceList.push(device);
+                    updateDevices(deviceList);
+                    setNumDevices(deviceList.length);
                 });
             });
         });
