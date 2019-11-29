@@ -141,7 +141,7 @@ const Overview = ({firebase, device}) => {
                             height="100%" 
                             width="90%" 
                             colors={["#0984e3"]} 
-                            title="Water"/>
+                            title="Moister"/>
                     </div>}
 
             </div>

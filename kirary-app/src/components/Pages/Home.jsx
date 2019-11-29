@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { withFirebase } from '../Firebase';
 
 import Overview from '../SimpleComponents/Overview';
+import Loading from '../SimpleComponents/Loading';
 
 const Home = (props) => {
     const [user, setUser] = useState(null);
@@ -84,7 +85,7 @@ const Home = (props) => {
                     </form>
                 </div>
             </header>
-            {loading && <main className="main">Loading ...</main>}
+            {loading && <Loading/>}
             {!loading && 
                 <main className="main">
                     {devices.map(device => 

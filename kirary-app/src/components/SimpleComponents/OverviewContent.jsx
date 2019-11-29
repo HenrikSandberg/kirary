@@ -5,7 +5,7 @@ const OverviewContent = ({key, title, content, icon, minimum}) => {
         let  color = '';
         if (title == "Moister") {
             color = (content > minimum) ? '#0984e3' : '#e17055';
-            content = content > minimum ? 'Good' : 'Needs water';
+            content = content > minimum ? 'Moist' : 'Dry';
             return color;
 
         } else if (title == "Temprature") {

@@ -22,7 +22,7 @@ const NavigationAuth = () => (
         </Link>
       </li>
       <li>
-        <Link to={ROUTES.HOME}>Home</Link>
+        <Link to={ROUTES.HOME}>Dashboard</Link>
       </li>
       <li>
         <Link to={ROUTES.ACCOUNT}>Account</Link>
