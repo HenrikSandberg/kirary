@@ -16,12 +16,8 @@ exports.waterPlant = functions.database
             let minimumWater = after.minimum_water;
         
             if (minimumWater === undefined || minimumWater === null) {
-                minimumWater = 1500;
+                minimumWater = 1200;
                 snapshot.after.ref.update({minimumWater: minimumWater});
-            }
-
-            if (moister < minimumWater && water_tank < minimum_water_storage) {
-                return snapshot.after.ref.update({watering: true});
             }
     
             if (water_tank <= minimum_water_storage) {
@@ -30,7 +26,6 @@ exports.waterPlant = functions.database
     
             return snapshot.after.ref.update({watering: (moister <= minimumWater)});
         }
-
 
         if (water_tank <= minimum_water_storage) {
             return snapshot.after.ref.update({watering: false});

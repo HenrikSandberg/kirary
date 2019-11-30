@@ -43,6 +43,10 @@ const Home = (props) => {
                 const data = childSnapshot.val();
                 props.firebase.device(data.uid).on('value', inner => {
                     const device = {...inner.val(), uid: data.uid};
+                    
+                    if (deviceList.includes(device.uid)){
+                        console.log('Duplicat');
+                    }
 
                     deviceList.push(device);
                     updateDevices(deviceList);
