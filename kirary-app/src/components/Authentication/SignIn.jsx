@@ -8,11 +8,13 @@ import { PasswordForgetLink } from './PasswordForget';
 import * as ROUTES from '../../constants/routes';
 
 const SignInPage = () => (
-  <div>
-    <h1>SignIn</h1>
-    <SignInForm />
-    <PasswordForgetLink />
-    <SignUpLink />
+  <div class="login-page">
+      <div class="form">
+        <h1>SignIn</h1>
+        <SignInForm />
+        <PasswordForgetLink />
+        <SignUpLink />
+      </div>
   </div>
 );
 
@@ -51,26 +53,26 @@ class SignInFormBase extends Component {
     const isInvalid = password === '' || email === '';
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          name="email"
-          value={email}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Email Address"
-        />
-        <input
-          name="password"
-          value={password}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Password"
-        />
-        <button disabled={isInvalid} type="submit">
-          Sign In
-        </button>
-        {error && <p>{error.message}</p>}
-      </form>
+          <form onSubmit={this.onSubmit} class="login-form">
+            <input
+              name="email"
+              value={email}
+              onChange={this.onChange}
+              type="text"
+              placeholder="Email Address"
+            />
+            <input
+              name="password"
+              value={password}
+              onChange={this.onChange}
+              type="password"
+              placeholder="Password"
+            />
+            <button disabled={isInvalid} type="submit">
+              Sign In
+            </button>
+            {error && <p>{error.message}</p>}
+          </form>
     );
   }
 }

@@ -5,9 +5,9 @@ $brand-forground: #292d31;
 $off-black: #35353c;
 $off-white: #ecf0f1;
 
-$accept-color-one: #F4711D;//#8DC53E;
-$accept-color-two: #78380F;//#A49F68;
-$accept-color-three: #A4A491;//#B08B7E;
+$accept-color-one: #8DC53E;//#8DC53E;
+$accept-color-two: #A49F68;//#A49F68;
+$accept-color-three: #B08B7E;//#B08B7E;
 
 $float-gray-color: #dfe6e9;
 $secound-float-gray-color: #b2bec3;
@@ -17,3 +17,57 @@ $success: #6c5ce7;
 $worning-red: #d13b3b;
 
 $brand-box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+
+
+@mixin gradiant-background {
+    background: linear-gradient(270deg, $accept-color-one, $accept-color-two, $accept-color-three);
+    background-size: 600% 600%;
+
+    -webkit-animation: AnimationName 30s ease infinite;
+    -moz-animation: AnimationName 30s ease infinite;
+    animation: AnimationName 30s ease infinite;
+
+    @-webkit-keyframes AnimationName {
+        0%{background-position:0% 50%}
+        50%{background-position:100% 50%}
+        100%{background-position:0% 50%}
+    }
+    @-moz-keyframes AnimationName {
+        0%{background-position:0% 50%}
+        50%{background-position:100% 50%}
+        100%{background-position:0% 50%}
+    }
+    @keyframes AnimationName {
+        0%{background-position:0% 50%}
+        50%{background-position:100% 50%}
+        100%{background-position:0% 50%}
+    }
+    
+}
+
+@mixin action-button {
+    background-color: $accept-color-one;
+    color:#fff;
+    font-size: 100%;
+    height: 35px;
+    width: 100%;
+    border: none;
+    box-shadow: $brand-box-shadow;
+    
+
+    &:disabled {
+        box-shadow: none;
+        color:$worning-red;
+        background-color: $worning-red;
+    }
+
+    &:disabled:hover {
+        box-shadow: none;
+        cursor: default;
+    }
+
+    &:hover{
+        background-color: lighten($accept-color-one, 5%);
+        cursor: pointer;
+    } 
+}

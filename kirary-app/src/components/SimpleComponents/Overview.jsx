@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { LineChart, AreaChart, ColumnChart } from 'react-chartkick';
 import 'chart.js'
 
@@ -12,6 +12,14 @@ import lightIcon from '../../resources/icons/sun.svg';
 const Overview = ({firebase, device}) => {
     const [selected, setSelected] = useState(device.plant_type)
     const [plants, setPlants] = useState(null);
+
+    useEffect(() => {
+        if (selected === null || plants === null) {
+            handlePlantTypes();
+        }
+        
+    }, [selected, plants]);
+
     
     const capitalize = s => {
         if (typeof s !== 'string') return ''
@@ -36,7 +44,6 @@ const Overview = ({firebase, device}) => {
         }
     }
     
-    handlePlantTypes()
     return (
         <div>
             <div className="main-overview">

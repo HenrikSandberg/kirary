@@ -21,7 +21,11 @@
     display: inline-block;
     font-size: 16px;
     cursor: pointer;
-    background: $accept-color-three;
+    background: $worning-red;
+
+    &:hover{
+      background: lighten($worning-red, 2.5%);
+    }
   }
 
   .brand-logo {

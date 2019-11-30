@@ -16,9 +16,11 @@ const INITIAL_STATE = {
   };
 
 const SignUpPage = () => (
-  <div>
-    <h1>SignUp</h1>
-    <SignUpForm />
+  <div className='login-page'>
+    <div className='form'>
+      <h1>SignUp</h1>
+      <SignUpForm />
+    </div>
   </div>
 );
 
@@ -70,20 +72,23 @@ class SignUpFormBase extends Component {
         username === '';
 
     return (
-      <form onSubmit={this.onSubmit}>
+      <form 
+        className='register-form'
+        onSubmit={this.onSubmit}>
+
         <input
-          name="username"
+          type="text"
           value={username}
           onChange={this.onChange}
           type="text"
-          placeholder="Full Name"
+          placeholder="name"
         />
         
         <input
           name="email"
           value={email}
           onChange={this.onChange}
-          type="text"
+          placeholder="email"
           placeholder="Email Address"
         />
         
@@ -113,7 +118,7 @@ class SignUpFormBase extends Component {
 }
 
 const SignUpLink = () => (
-  <p>
+  <p style={{color: '#35353c'}}>
     Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
   </p>
 );
