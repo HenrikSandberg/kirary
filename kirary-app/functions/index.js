@@ -33,3 +33,16 @@ exports.waterPlant = functions.database
         return Promise;
     }
 );
+
+exports.logCleaning = functions.database
+    .ref('devide/{deviceID}')
+    .onUpdate((snapshot, context) => {
+        const after = snapshot.after.val();
+
+        const moisterLog = after.moister_log;
+        const celciusLog = after.celcius_log;
+
+        // if (moisterLog.length < 10) {
+        //     let newLog = [];
+        // }
+})

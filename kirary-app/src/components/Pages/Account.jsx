@@ -55,14 +55,8 @@ const AccountPage = (props) => {
   }
 
   const onDelete = () => {
-    props.firebase
-    .doDeleteAccount()
-    .then(()=> {
-      props.history.push(ROUTES.LANDING);
-    })
-    .catch(error => {
-      setError({ error });
-    })
+    props.firebase.doDeleteAccount();
+    props.history.push(ROUTES.LANDING);
   }
 
   const isInvalid = passwordOne !== passwordTwo || passwordOne === '';

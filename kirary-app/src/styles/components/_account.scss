@@ -1,4 +1,4 @@
-@mixin delete {
+@mixin inverted-button {
     background-color: $off-white;
     color: $worning-red;
     box-shadow: none;
@@ -8,24 +8,22 @@
     @include from;
 
     .deleteAccount{
-        @include delete;
+        @include inverted-button;
         &:hover{
-            @include delete;
+            @include inverted-button;
         } 
         &:active{
-            @include delete;
+            @include inverted-button;
         }
     }
 
     .cancel-button {
-        background-color: $off-white;
+        @include inverted-button;
         color: $background-gray-color;
-        box-shadow: none;
 
         &:hover {
-            background-color: $off-white;
+            @include inverted-button;
             color: $background-gray-color;
-            box-shadow: none;
         }
     }
 }

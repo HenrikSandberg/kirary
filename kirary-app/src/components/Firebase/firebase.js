@@ -27,12 +27,6 @@ class Firebase {
         });
     }
 
-    doDeleteAccount = () => {
-        const user = this.getCurrentUser;
-        this.user(user.uid).set(null);
-        this.auth.currentUser.delete();
-    }
-
     doCreateUserWithEmailAndPassword = (email, password) =>
         this.auth.createUserWithEmailAndPassword(email, password);
 
@@ -44,6 +38,12 @@ class Firebase {
     doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
     
     doPasswordUpdate = password => this.auth.currentUser.updatePassword(password);
+
+    doDeleteAccount = () => {
+        const uid = this.auth.currentUser.uid
+        this.user(uid).set(null);
+        this.auth.currentUser.delete().then(()=> true).catch(()=> false);
+    }
 
 
     //DATABASE GET
