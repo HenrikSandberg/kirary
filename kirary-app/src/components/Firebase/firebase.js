@@ -27,7 +27,11 @@ class Firebase {
         });
     }
 
-    doDeleteAccount = () => this.getCurrentUser().delete().then(() => true).catch(() => false);
+    doDeleteAccount = () => {
+        const user = this.getCurrentUser;
+        this.user(user.uid).set(null);
+        this.auth.currentUser.delete();
+    }
 
     doCreateUserWithEmailAndPassword = (email, password) =>
         this.auth.createUserWithEmailAndPassword(email, password);

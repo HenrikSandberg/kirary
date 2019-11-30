@@ -1,34 +1,45 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'recompose';
+
 import { withFirebase } from '../Firebase';
+import * as ROUTES from '../../constants/routes';
+
+
 const INITIAL_STATE = {
   passwordOne: '',
   passwordTwo: '',
   error: null,
 };
+
 class PasswordChangeForm extends Component {
+  
   constructor(props) {
     super(props);
     this.state = { ...INITIAL_STATE };
   }
+  
   onSubmit = event => {
     const { passwordOne } = this.state;
     this.props.firebase
       .doPasswordUpdate(passwordOne)
       .then(() => {
         this.setState({ ...INITIAL_STATE });
+        this.props.history.push(ROUTES.ACCOUNT);
       })
       .catch(error => {
         this.setState({ error });
       });
     event.preventDefault();
   };
+
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
+
   render() {
     const { passwordOne, passwordTwo, error } = this.state;
-    const isInvalid =
-      passwordOne !== passwordTwo || passwordOne === '';
+    const isInvalid = passwordOne !== passwordTwo || passwordOne === '';
     return (
       <form onSubmit={this.onSubmit}>
         <input
@@ -53,4 +64,4 @@ class PasswordChangeForm extends Component {
     );
   }
 }
-export default withFirebase(PasswordChangeForm);
+export default compose( withRouter, withFirebase,)(PasswordChangeForm);

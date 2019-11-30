@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
 
-
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 
@@ -77,10 +76,10 @@ class SignUpFormBase extends Component {
         onSubmit={this.onSubmit}>
 
         <input
+          name='username'
           type="text"
           value={username}
           onChange={this.onChange}
-          type="text"
           placeholder="name"
         />
         
