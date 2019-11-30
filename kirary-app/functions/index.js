@@ -6,19 +6,25 @@ exports.waterPlant = functions.database
         //const deviceID = context.params.deviceID;
         const prev = snapshot.before.val();
         const after = snapshot.after.val();
+        const minimum_water_storage = 1200;
 
         const moister = after.moister;
         const prevMoister = prev.moister;
+        const water_tank = after.water_storeage;
 
         if (moister !== prevMoister) {
             let minimumWater = after.minimum_water;
         
             if (minimumWater === undefined || minimumWater === null) {
                 minimumWater = 1500;
-                snapshot.after.ref.update({maxWater: minimumWater});
+                snapshot.after.ref.update({minimumWater: minimumWater});
+            }
+
+            if (moister < minimumWater && water_tank < minimum_water_storage) {
+                return snapshot.after.ref.update({watering: true});
             }
     
-            if (after.water_storeage <= 500) {
+            if (water_tank <= minimum_water_storage) {
                 return snapshot.after.ref.update({watering: false});
             }
     
@@ -26,23 +32,10 @@ exports.waterPlant = functions.database
         }
 
 
-        if (after.water_storeage <= 1100) {
+        if (water_tank <= minimum_water_storage) {
             return snapshot.after.ref.update({watering: false});
         }
 
         return Promise;
     }
 );
-
-exports.logCleaning = functions.database
-    .ref('devide/{deviceID}')
-    .onUpdate((snapshot, context) => {
-        const after = snapshot.after.val();
-
-        const moisterLog = after.moister_log;
-        const celciusLog = after.celcius_log;
-
-        // if (moisterLog.length < 10) {
-        //     let newLog = [];
-        // }
-})

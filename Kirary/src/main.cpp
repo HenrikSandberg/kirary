@@ -25,7 +25,7 @@ NTPClient timeClient(ntpUDP);
 const int motor_pin = 18;
 const int temprature_pin = 34;
 const int moister_pin = 39;
-const int light_pin = 35;
+const int light_pin = 38;
 const int water_storeage_pin = 33;
 
 // VARIABLES
@@ -70,11 +70,11 @@ void setup()
   }
 }
 
-/* update_light(); */
+
 void loop()
 {
-  read_moister();
   read_temprature();
+  /* update_light(); */
   update_water_tank();
 
   water_plant();
@@ -164,11 +164,11 @@ void update_water_tank()
 
   for (int i = 0; i < number_of_rounds; i++)
   {
-    measure += analogRead(water_storeage_pin);
+    measure += analogRead(moister_pin);
     delay(10);
   }
 
-  const int read_water = measure / number_of_rounds;
+  const int read_water = MAX_MOISTER - (measure / number_of_rounds);
 
   if (read_water > water_tank_reading + 50)
   {
@@ -199,9 +199,8 @@ void check_for_upload_logs()
 
   if (current_time > last_log)
   {
-    update_logs("moister_log", moister_levle);
     update_logs("celcius_log", celcius);
-    //update_logs("light_log", average_light);
+    /* update_logs("light_log", average_light); */
 
     last_log = current_time;
   }
@@ -211,23 +210,6 @@ void update_logs(String log_nam, int data)
 {
   String log_key = String(timeClient.getFormattedDate());
   Firebase.setInt(firebaseData, path + "/"+log_nam+"/"+log_key, data);
-}
-
-void read_moister()
-{
-  int moister_reading = analogRead(moister_pin);
-  moister_reading = MAX_MOISTER - moister_reading;
-  
-  if (moister_reading > moister_levle + 50) 
-  {
-    moister_levle = moister_reading;
-    Firebase.setInt(firebaseData, path + "/moister", moister_levle);
-  } 
-  else if (moister_reading < moister_levle - 50) 
-  {
-    moister_levle = moister_reading;
-    Firebase.setInt(firebaseData, path + "/moister", moister_levle);
-  }
 }
 
 void read_temprature()
@@ -242,7 +224,6 @@ void read_temprature()
   }
 
   measure = measure / number_of_rounds;
-  Serial.println(measure);
 
   if (celcius == 0.0)
   {
