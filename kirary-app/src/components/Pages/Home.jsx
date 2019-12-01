@@ -15,6 +15,7 @@ const Home = (props) => {
         if (user === null || user === undefined) {
             getUser();
         } else if (user && (numDevices !== devices.length)){
+            messanger();
             getDevices();
         }
     }, [user, loading, devices, numDevices]);
@@ -34,6 +35,22 @@ const Home = (props) => {
 
             if (loading) setLoading(false);
         }
+    }
+
+    const messanger = () => {
+        const message = props.firebase.getMessaging();
+
+        message.requestPermission()
+        .then(async () => {
+                await message.getToken().then(token => {
+                    props.firebase.doSetUserToken(user.uid, token);
+                })
+                
+        })
+        .catch(error => {
+            console.log("Unable to get permission to notify.", error);
+        });
+        navigator.serviceWorker.addEventListener("message", (message) => console.log(message));
     }
 
     const getDevices = () => {

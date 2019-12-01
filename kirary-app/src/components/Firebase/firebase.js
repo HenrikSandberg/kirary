@@ -1,6 +1,7 @@
 import app from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
+import "firebase/messaging";
 
 const config = {
     apiKey: "AIzaSyDpEivc65FYQBnVTEWqSMaIETo5l0_6IsI",
@@ -17,6 +18,11 @@ class Firebase {
         app.initializeApp(config);
         this.auth = app.auth();
         this.db = app.database();
+        this.messaging = app.messaging();
+
+        this.messaging.usePublicVapidKey(
+            'BNtetp8kFq3knkERlGiAQ2FNgI4kto8rS_Y4bFwjvTX9lkuTjZ46eRYgwWJUfUmWkX0LQAXTOIvoUu-KmMvoMUM'
+        );
     }
 
     getCurrentUser = () => {
@@ -26,6 +32,8 @@ class Firebase {
             } 
         });
     }
+
+    getMessaging = () => this.messaging;
 
     doCreateUserWithEmailAndPassword = (email, password) =>
         this.auth.createUserWithEmailAndPassword(email, password);
@@ -66,6 +74,8 @@ class Firebase {
         }
     }
 
+    doSetUserToken = (uid, token) => this.db.ref(`users/${uid}/token`).set(token);
+
     addDeviceToUnser = (uid, deviceUid) => {
         this.device(deviceUid).on('value', snapshot => {
             if (snapshot.val() !== null) {
@@ -81,4 +91,5 @@ class Firebase {
     activateWater = uid => this.db.ref(`devide/${uid}/watering`).set(true); //.child('watering')
 
 }
+
 export default Firebase;

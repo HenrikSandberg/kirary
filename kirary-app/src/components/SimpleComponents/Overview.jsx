@@ -76,7 +76,7 @@ const Overview = ({firebase, device}) => {
                             Device: {device.uid}
                         </div>
                         <div className='water-text'>
-                            {(device.water_storeage > 500 ? "Enough water" : "Need to refill") }
+                            {(device.water_storeage > 500 ? "Enough" : "Need to refill") }
                         </div>
                         {!selected && plants ?
                             <div className='main-focus-action'>
@@ -97,7 +97,7 @@ const Overview = ({firebase, device}) => {
                                 <button 
                                     className='reset-selected-plant-button'
                                     onClick={removeSelectedPlant}>
-                                        Change plant
+                                        Change
                                 </button>
                             </div>
                         }
@@ -111,7 +111,7 @@ const Overview = ({firebase, device}) => {
                             disabled={device.water_storeage < 500}
                             value={device.uid} 
                             onClick={handleWaterClick}> 
-                                Water plant 
+                                Water 
                         </button>
                     </div>
                 }

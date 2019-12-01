@@ -11,8 +11,8 @@
 #define FIREBASE_AUTH "OC47waZR7yjVfACbypdakuotyxwinkNLfqkGnV0I"
 
 // WI-FI CONNECTION
-const char* ssid =  "Student"; // "HenriksNyeNettverk";
-const char* pass =  "Kristiania1914"; //"G4rNAU6HwwuXXaDXwbEKovLGzhbq6Tq"; 
+const char* ssid =  "Student";
+const char* pass =  "Kristiania1914";
 
 WiFiClient espClient;
 FirebaseData firebaseData;

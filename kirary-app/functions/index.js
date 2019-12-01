@@ -1,4 +1,6 @@
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp(functions.config().firebase);
 
 exports.waterPlant = functions.database
     .ref('devide/{deviceID}')
@@ -32,5 +34,60 @@ exports.waterPlant = functions.database
         }
 
         return Promise;
+    }
+);
+
+exports.sendAdminNotification = functions.database
+    .ref().onUpdate((snapshot, context) => {
+        const after = snapshot.after.val();
+        const devices = after.devide;
+        const users = after.users;
+        const minimum_water_storage = 1200;
+
+        Object.keys(devices).forEach(uid => {
+            const device = devices[uid];
+
+            Object.keys(users).forEach(userKey => {
+                const user = users[userKey];
+                const userDevices = user.devides;
+
+                Object.keys(userDevices).forEach(deviceKey => {
+                    const path = `users/${userKey}/devides/${deviceKey}/message`;
+
+                    if (userDevices[deviceKey].uid === uid && !userDevices[deviceKey].message) {
+                        if (device.water_storeage < minimum_water_storage) {
+                            const payload = {notification: {
+                                    title: 'Out of water',
+                                    body: `You need to refill ${device.plant_type} water tank`
+                                }   
+                            };
+                            
+                            snapshot.after.ref.child(path).set(true);
+                            return admin.messaging().sendToDevice(user.token, payload);
+                            
+                        } else if (device.temprature < 10.00) {
+                            const path = `users/${userKey}/devides/${deviceKey}/message`;
+
+                            if (userDevices[deviceKey].uid === uid && !userDevices[deviceKey].message) {
+                                const payload = {notification: {
+                                        title: 'Too cold',
+                                        body:  `You need to refill ${device.plant_type}
+                                            water tank. Temp is now ${device.temprature}`
+                                    }   
+                                };
+                                
+                                snapshot.after.ref.child(path).set(true);
+                                return admin.messaging().sendToDevice(user.token, payload);
+
+                            }
+                        } else if (device.temprature > 10.0 || device.water_storeage > minimum_water_storage) {
+                            snapshot.after.ref.child(path).set(false);
+                            return Promise();
+                        }
+                    }
+                });
+            })
+
+        });        
     }
 );
