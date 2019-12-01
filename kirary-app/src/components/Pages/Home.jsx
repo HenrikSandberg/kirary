@@ -116,7 +116,10 @@ const Home = (props) => {
             {loading && 
                 <main className="main">
                     <h1>Your devices will show</h1>
-                    <p>If you have not added any devices jet, type in the device code and tap the add button</p>
+                    <p>
+                        If you have not added any devices jet, 
+                        type in the device code and tap the add button
+                    </p>
                     <Loading/>
                 </main>
             }
