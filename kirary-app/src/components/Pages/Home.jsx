@@ -15,7 +15,7 @@ const Home = (props) => {
         if (user === null || user === undefined) {
             getUser();
         } else if (user && (numDevices !== devices.length)){
-            messanger();
+            // messanger();
             getDevices();
         }
     }, [user, loading, devices, numDevices]);
@@ -37,21 +37,20 @@ const Home = (props) => {
         }
     }
 
-    const messanger = () => {
-        const message = props.firebase.getMessaging();
+    // const messanger = () => {
+    //     const message = props.firebase.getMessaging();
 
-        message.requestPermission()
-        .then(async () => {
-                await message.getToken().then(token => {
-                    props.firebase.doSetUserToken(user.uid, token);
-                })
+    //     message.requestPermission()
+    //     .then(async () => {
+    //             await message.getToken().then(token => {
+    //                 props.firebase.doSetUserToken(user.uid, token);
+    //             })
                 
-        })
-        .catch(error => {
-            console.log("Unable to get permission to notify.", error);
-        });
-        navigator.serviceWorker.addEventListener("message", (message) => console.log(message));
-    }
+    //     })
+    //     .catch(error => {
+    //         console.log("Unable to get permission to notify.", error);
+    //     });
+    // }
 
     const getDevices = () => {
         let deviceList = [];
@@ -61,11 +60,19 @@ const Home = (props) => {
                 props.firebase.device(data.uid).on('value', inner => {
                     const device = {...inner.val(), uid: data.uid};
                     
-                    if (deviceList.includes(device.uid)){
-                        console.log('Duplicat');
+                    let containsDevice = false
+                    if (deviceList.length > 0) {
+                        deviceList.forEach( d => {
+                            if (d.uid === device.uid) {
+                                deviceList.d = device;
+                                containsDevice = true;
+                            }
+                        });
                     }
-
-                    deviceList.push(device);
+                    if (!containsDevice) {
+                        deviceList.push(device);
+                    }
+                    
                     updateDevices(deviceList);
                     setNumDevices(deviceList.length);
                 });

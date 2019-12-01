@@ -37,57 +37,59 @@ exports.waterPlant = functions.database
     }
 );
 
-exports.sendAdminNotification = functions.database
-    .ref().onUpdate((snapshot, context) => {
-        const after = snapshot.after.val();
-        const devices = after.devide;
-        const users = after.users;
-        const minimum_water_storage = 1200;
+// exports.sendAdminNotification = functions.database
+//     .ref().onUpdate((snapshot, context) => {
+//         const after = snapshot.after.val();
+//         const devices = after.devide;
+//         const users = after.users;
+//         const minimum_water_storage = 1200;
 
-        Object.keys(devices).forEach(uid => {
-            const device = devices[uid];
+//         Object.keys(devices).forEach(uid => {
+//             const device = devices[uid];
 
-            Object.keys(users).forEach(userKey => {
-                const user = users[userKey];
-                const userDevices = user.devides;
+//             Object.keys(users).forEach(userKey => {
+//                 const user = users[userKey];
+//                 const userDevices = user.devides;
 
-                Object.keys(userDevices).forEach(deviceKey => {
-                    const path = `users/${userKey}/devides/${deviceKey}/message`;
+//                 Object.keys(userDevices).forEach(deviceKey => {
+//                     const path = `users/${userKey}/devides/${deviceKey}/message`;
 
-                    if (userDevices[deviceKey].uid === uid && !userDevices[deviceKey].message) {
-                        if (device.water_storeage < minimum_water_storage) {
-                            const payload = {notification: {
-                                    title: 'Out of water',
-                                    body: `You need to refill ${device.plant_type} water tank`
-                                }   
-                            };
+//                     if (userDevices[deviceKey].uid === uid && !userDevices[deviceKey].message) {
+//                         if (device.water_storeage < minimum_water_storage) {
+//                             const payload = {notification: {
+//                                     title: 'Out of water',
+//                                     body: `You need to refill ${device.plant_type} water tank`
+//                                 }   
+//                             };
                             
-                            snapshot.after.ref.child(path).set(true);
-                            return admin.messaging().sendToDevice(user.token, payload);
+//                             console.log('Set device to true');
+//                             snapshot.after.ref.child(path).set(true);
+//                             return admin.messaging().sendToDevice(user.token, payload);
                             
-                        } else if (device.temprature < 10.00) {
-                            const path = `users/${userKey}/devides/${deviceKey}/message`;
+//                         } else if (device.temprature < 10.00) {
 
-                            if (userDevices[deviceKey].uid === uid && !userDevices[deviceKey].message) {
-                                const payload = {notification: {
-                                        title: 'Too cold',
-                                        body:  `You need to refill ${device.plant_type}
-                                            water tank. Temp is now ${device.temprature}`
-                                    }   
-                                };
+//                             if (userDevices[deviceKey].uid === uid && !userDevices[deviceKey].message) {
+//                                 const payload = {notification: {
+//                                         title: 'Too cold',
+//                                         body:  `You need to refill ${device.plant_type}
+//                                             water tank. Temp is now ${device.temprature}`
+//                                     }   
+//                                 };
                                 
-                                snapshot.after.ref.child(path).set(true);
-                                return admin.messaging().sendToDevice(user.token, payload);
+//                                 console.log('Set device to true');
+//                                 snapshot.after.ref.child(path).set(true);
+//                                 return admin.messaging().sendToDevice(user.token, payload);
 
-                            }
-                        } else if (device.temprature > 10.0 || device.water_storeage > minimum_water_storage) {
-                            snapshot.after.ref.child(path).set(false);
-                            return Promise();
-                        }
-                    }
-                });
-            })
+//                             }
+//                         }
+                        
+//                     } else if (device.temprature > 10.0 || device.water_storeage > minimum_water_storage) {
+//                         console.log('Set device to false');
+//                         snapshot.after.ref.child(path).set(false);
+//                     }
+//                 });
+//             })
 
-        });        
-    }
-);
+//         });        
+//     }
+// );

@@ -7,7 +7,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.setBackgroundMessageHandler(function(payload) {
+messaging.setBackgroundMessageHandler((payload) => {
   const promiseChain = clients
     .matchAll({
       type: "window",
@@ -25,7 +25,9 @@ messaging.setBackgroundMessageHandler(function(payload) {
   return promiseChain;
 });
 
-self.addEventListener('notificationclick', function(event) {
+self.addEventListener('notificationclick', (event) => {
   // do what you want
   // ...
 });
+
+export {messaging}

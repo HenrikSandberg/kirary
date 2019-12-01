@@ -18,11 +18,11 @@ class Firebase {
         app.initializeApp(config);
         this.auth = app.auth();
         this.db = app.database();
-        this.messaging = app.messaging();
+        // this.messaging = app.messaging();
 
-        this.messaging.usePublicVapidKey(
-            'BNtetp8kFq3knkERlGiAQ2FNgI4kto8rS_Y4bFwjvTX9lkuTjZ46eRYgwWJUfUmWkX0LQAXTOIvoUu-KmMvoMUM'
-        );
+        // this.messaging.usePublicVapidKey(
+        //     'BNtetp8kFq3knkERlGiAQ2FNgI4kto8rS_Y4bFwjvTX9lkuTjZ46eRYgwWJUfUmWkX0LQAXTOIvoUu-KmMvoMUM'
+        // );
     }
 
     getCurrentUser = () => {

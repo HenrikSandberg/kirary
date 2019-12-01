@@ -71,12 +71,12 @@ const Overview = ({firebase, device}) => {
             <div className="main-cards">
 
                 {device.water_storeage >= 0 && 
-                    <div className={"card action-card " + (device.water_storeage > 500 ? "full" : "empty")}>
+                    <div className={"card action-card " + (device.water_storeage > 1200 ? "full" : "empty")}>
                         <div className='device-name'>
                             Device: {device.uid}
                         </div>
                         <div className='water-text'>
-                            {(device.water_storeage > 500 ? "Enough" : "Need to refill") }
+                            {(device.water_storeage > 1200 ? "Enough" : "Need to refill") }
                         </div>
                         {!selected && plants ?
                             <div className='main-focus-action'>
@@ -103,12 +103,12 @@ const Overview = ({firebase, device}) => {
                         }
                         <div className='water-icon'>
                             <img 
-                                src={(device.water_storeage > 500 ? full : empty)} 
+                                src={(device.water_storeage > 1200 ? full : empty)} 
                                 alt-text='icon'/>
                         </div>
                         <button 
                             className='water-plant-button'
-                            disabled={device.water_storeage < 500}
+                            disabled={device.water_storeage < 1200}
                             value={device.uid} 
                             onClick={handleWaterClick}> 
                                 Water 
